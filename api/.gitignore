@@ -1,0 +1,7 @@
+# Ignore environment variables
+.env
+.env.local
+.env.production
+
+# Ignore credentials file
+credentials.json
