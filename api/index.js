@@ -5,7 +5,11 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const admin = require('firebase-admin');
 
-app.use(cors());
+
+
+app.use(cors({
+  origin: 'https://trade-tracker-nine.vercel.app/',
+}));
 app.use(express.json());
 
 const serviceAccount = require('./credentials.json');
