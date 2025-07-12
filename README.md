@@ -49,10 +49,10 @@ npm install
 
 ### 2. Environment Variables
 
-Create a `.env.local` file in the root directory with your Firebase configuration:
+Create a `.env.local` file in the root directory with your configuration:
 
 ```env
-# Firebase Configuration (Required)
+# Firebase Configuration (Required for Authentication)
 NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
@@ -61,8 +61,12 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id
 
-# Optional: Backend API URL (for future features)
-NEXT_PUBLIC_BACKEND_URL=https://your-backend-api.vercel.app
+# Database Configuration (Required for Trade Storage)
+MONGODB_URI=your_mongodb_connection_string
+
+# AI Analysis Configuration (Required for Stock Analysis)
+GEMINI_API_KEY=your_google_gemini_api_key
+ALPHA_VANTAGE_API_KEY=your_alpha_vantage_api_key
 ```
 
 ### 3. Firebase Setup
@@ -99,7 +103,7 @@ git push -u origin main
    - Go to [vercel.com](https://vercel.com)
    - Click "New Project"
    - Import your GitHub repository
-   - Add environment variables in Vercel dashboard
+   - Add environment variables in Vercel dashboard (all variables from `.env.local`)
    - Deploy!
 
 ### Option 2: Vercel CLI
@@ -137,10 +141,21 @@ NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=G-ABC123 (optional)
 
 ### Where to Find These Values
 
+**Firebase Configuration:**
 1. Firebase Console → Project Settings → General tab
 2. Scroll to "Your apps" section
 3. Click on the web app icon
 4. Copy the config object values
+
+**MongoDB Configuration:**
+1. MongoDB Atlas → Database → Connect
+2. Choose "Connect your application"
+3. Copy the connection string
+4. Replace `<password>` with your database password
+
+**AI Analysis Configuration:**
+1. **Gemini API Key**: Google AI Studio → API Keys → Create API Key
+2. **Alpha Vantage API Key**: Alpha Vantage → Get Your Free API Key
 
 ## 🎨 Customization
 
