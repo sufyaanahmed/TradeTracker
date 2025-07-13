@@ -28,8 +28,10 @@ export default async function handler(req, res) {
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
+        connectTimeoutMS: 30000,
+        maxIdleTimeMS: 30000,
+        ssl: true,
+        sslValidate: true,
       });
 
       await client.connect();
