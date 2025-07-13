@@ -89,6 +89,9 @@ export default async function handler(req, res) {
           socketTimeoutMS: 45000,
           connectTimeoutMS: 30000,
           maxIdleTimeMS: 30000,
+          tls: true,
+          tlsAllowInvalidCertificates: false,
+          tlsAllowInvalidHostnames: false,
         });
         
         await client.connect();

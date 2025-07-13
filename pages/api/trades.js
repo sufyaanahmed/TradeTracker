@@ -59,13 +59,16 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Invalid database connection string format' });
       }
 
-      // MongoDB connection options optimized for serverless
+      // MongoDB connection options optimized for serverless with TLS
       const client = new MongoClient(mongoUri, {
         maxPoolSize: 10,
         serverSelectionTimeoutMS: 5000,
         socketTimeoutMS: 45000,
         connectTimeoutMS: 30000,
         maxIdleTimeMS: 30000,
+        tls: true,
+        tlsAllowInvalidCertificates: false,
+        tlsAllowInvalidHostnames: false,
       });
 
       await client.connect();
