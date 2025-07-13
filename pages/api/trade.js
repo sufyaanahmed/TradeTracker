@@ -17,10 +17,24 @@ export default async function handler(req, res) {
       if (!userId) {
         return res.status(400).json({ error: 'Missing required field: userId' });
       }
+
+      if (!mongoUri) {
+        console.error('MONGODB_URI environment variable is not set');
+        return res.status(500).json({ error: 'Database connection not configured' });
+      }
       
-      const client = new MongoClient(mongoUri);
+      // MongoDB connection options optimized for serverless
+      const client = new MongoClient(mongoUri, {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        bufferMaxEntries: 0,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+
       await client.connect();
-      const db = client.db('test');
+      const db = client.db(); // Use default database from connection string
       const trade = await db.collection('trades').insertOne({
         name,
         date,
@@ -34,7 +48,11 @@ export default async function handler(req, res) {
       res.status(201).json(trade);
     } catch (error) {
       console.error('Error adding trade:', error);
-      res.status(500).json({ error: 'Failed to add trade', details: error.message });
+      console.error('MongoDB URI exists:', !!mongoUri);
+      res.status(500).json({ 
+        error: 'Failed to add trade', 
+        details: error.message 
+      });
     }
   } else {
     res.setHeader('Allow', ['POST']);

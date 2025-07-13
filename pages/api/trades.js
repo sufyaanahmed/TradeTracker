@@ -50,13 +50,23 @@ export default async function handler(req, res) {
     // Handle GET request - fetch trades for authenticated user (GET /trades)
     try {
       if (!mongoUri) {
+        console.error('MONGODB_URI environment variable is not set');
         return res.status(500).json({ error: 'Database connection not configured' });
       }
 
-      const client = new MongoClient(mongoUri);
+      // MongoDB connection options optimized for serverless
+      const client = new MongoClient(mongoUri, {
+        maxPoolSize: 10,
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+        bufferMaxEntries: 0,
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+
       await client.connect();
       
-      const db = client.db('test'); // MongoDB Atlas usually uses 'test' database
+      const db = client.db(); // Use default database from connection string
       const trades = await db.collection('trades').find({ userId }).sort({ date: -1 }).toArray();
       
       await client.close();
@@ -65,7 +75,13 @@ export default async function handler(req, res) {
       res.status(200).json(trades);
     } catch (error) {
       console.error('Error fetching trades:', error);
-      res.status(500).json({ message: 'Internal Server Error', error: error.message });
+      console.error('MongoDB URI exists:', !!mongoUri);
+      console.error('User ID:', userId);
+      res.status(500).json({ 
+        message: 'Internal Server Error', 
+        error: error.message,
+        details: 'Database connection failed'
+      });
     }
   } else {
     res.setHeader('Allow', ['GET']);

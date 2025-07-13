@@ -78,9 +78,22 @@ export default async function handler(req, res) {
       // Portfolio Analysis - Get user's trades and analyze them
       try {
         const mongoUri = process.env.MONGODB_URI;
-        const client = new MongoClient(mongoUri);
+        
+        if (!mongoUri) {
+          throw new Error('Database connection not configured');
+        }
+        
+        const client = new MongoClient(mongoUri, {
+          maxPoolSize: 10,
+          serverSelectionTimeoutMS: 5000,
+          socketTimeoutMS: 45000,
+          bufferMaxEntries: 0,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        });
+        
         await client.connect();
-        const db = client.db('test');
+        const db = client.db();
         const userTrades = await db.collection('trades').find({ userId }).sort({ date: -1 }).toArray();
         await client.close();
 
