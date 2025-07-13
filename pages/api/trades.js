@@ -54,6 +54,11 @@ export default async function handler(req, res) {
         return res.status(500).json({ error: 'Database connection not configured' });
       }
 
+      if (!mongoUri.startsWith('mongodb://') && !mongoUri.startsWith('mongodb+srv://')) {
+        console.error('Invalid MongoDB URI format:', mongoUri);
+        return res.status(500).json({ error: 'Invalid database connection string format' });
+      }
+
       // MongoDB connection options optimized for serverless
       const client = new MongoClient(mongoUri, {
         maxPoolSize: 10,
@@ -75,8 +80,6 @@ export default async function handler(req, res) {
       res.status(200).json(trades);
     } catch (error) {
       console.error('Error fetching trades:', error);
-      console.error('MongoDB URI exists:', !!mongoUri);
-      console.error('User ID:', userId);
       res.status(500).json({ 
         message: 'Internal Server Error', 
         error: error.message,

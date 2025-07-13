@@ -3,11 +3,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { TrendingUp, DollarSign, Activity, LogOut } from 'lucide-react';
+import { TrendingUp, DollarSign, Activity, LogOut, TrendingDown } from 'lucide-react';
+import { getApiUrl, getApiHeaders } from '../lib/api';
 
 export default function Dashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
+  const [trades, setTrades] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in
@@ -21,7 +24,56 @@ export default function Dashboard() {
     }
 
     setUser({ uid, uname, accessToken });
+    fetchTrades(uid);
   }, [router]);
+
+  const fetchTrades = async (userId) => {
+    try {
+      setLoading(true);
+      const accessToken = localStorage.getItem('accessToken');
+      
+      if (!accessToken) {
+        console.error('No access token found');
+        router.push('/');
+        return;
+      }
+
+      const url = getApiUrl('/trades');
+      const headers = getApiHeaders(accessToken);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch trades: ${response.status}`);
+      }
+      
+      const tradesData = await response.json();
+      setTrades(tradesData || []);
+    } catch (error) {
+      console.error('Error fetching trades:', error);
+      // Don't show alert on dashboard, just log the error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateStats = () => {
+    const totalTrades = trades.length;
+    const totalPnL = trades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
+    const profitableTrades = trades.filter(t => t.pl > 0).length;
+    const winRate = totalTrades > 0 ? Math.round((profitableTrades / totalTrades) * 100) : 0;
+
+    return {
+      totalTrades,
+      totalPnL,
+      winRate
+    };
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('uid');
@@ -37,6 +89,8 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  const stats = calculateStats();
 
   return (
     <div className="min-h-screen bg-cyber-darker p-4">
@@ -61,9 +115,11 @@ export default function Dashboard() {
               <Activity className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">
+                {loading ? '...' : stats.totalTrades}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Start by adding your first trade
+                {stats.totalTrades === 0 ? 'Start by adding your first trade' : 'Total positions recorded'}
               </p>
             </CardContent>
           </Card>
@@ -71,10 +127,20 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total P&L</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              {loading ? 
+                <DollarSign className="h-4 w-4 text-muted-foreground" /> :
+                (stats.totalPnL >= 0 ? 
+                  <TrendingUp className="h-4 w-4 text-green-500" /> : 
+                  <TrendingDown className="h-4 w-4 text-red-500" />
+                )
+              }
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">$0.00</div>
+              <div className={`text-2xl font-bold ${loading ? '' : (stats.totalPnL >= 0 ? 'profit-text' : 'loss-text')}`}>
+                {loading ? '...' : (
+                  `${stats.totalPnL >= 0 ? '+' : ''}$${stats.totalPnL.toFixed(2)}`
+                )}
+              </div>
               <p className="text-xs text-muted-foreground">
                 Your trading performance
               </p>
@@ -87,9 +153,11 @@ export default function Dashboard() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">0%</div>
+              <div className="text-2xl font-bold">
+                {loading ? '...' : `${stats.winRate}%`}
+              </div>
               <p className="text-xs text-muted-foreground">
-                Track your success rate
+                {stats.totalTrades === 0 ? 'Track your success rate' : 'Profitable trades ratio'}
               </p>
             </CardContent>
           </Card>
@@ -143,25 +211,55 @@ export default function Dashboard() {
           </Card>
         </div>
 
+        {/* Recent Trades Preview */}
+        {!loading && trades.length > 0 && (
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Recent Trades</h2>
+              <Button variant="outline" onClick={() => router.push('/trades')}>
+                View All
+              </Button>
+            </div>
+            <div className="grid gap-4">
+              {trades.slice(0, 3).map((trade, index) => (
+                <Card key={index}>
+                  <CardContent className="flex justify-between items-center p-4">
+                    <div>
+                      <h3 className="font-semibold">{trade.name}</h3>
+                      <p className="text-sm text-muted-foreground">{new Date(trade.date).toLocaleDateString()}</p>
+                    </div>
+                    <div className="text-right">
+                      <div className={`font-bold ${trade.pl >= 0 ? 'profit-text' : 'loss-text'}`}>
+                        {trade.pl >= 0 ? '+' : ''}${trade.pl.toFixed(2)}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{trade.exchange}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Coming Soon Features */}
         <div className="mt-12">
           <h2 className="text-2xl font-bold mb-6 text-center glow-text">Coming Soon</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="glass-effect p-4 rounded-lg text-center">
-              <h3 className="font-semibold mb-2">Trade Journal</h3>
-              <p className="text-sm text-muted-foreground">Log and track all your trades</p>
-            </div>
-            <div className="glass-effect p-4 rounded-lg text-center">
-              <h3 className="font-semibold mb-2">Portfolio Analytics</h3>
+              <h3 className="font-semibold mb-2">Advanced Analytics</h3>
               <p className="text-sm text-muted-foreground">Detailed performance metrics</p>
             </div>
             <div className="glass-effect p-4 rounded-lg text-center">
-              <h3 className="font-semibold mb-2">AI Stock Analysis</h3>
-              <p className="text-sm text-muted-foreground">Get AI insights on stocks</p>
+              <h3 className="font-semibold mb-2">Risk Management</h3>
+              <p className="text-sm text-muted-foreground">Portfolio risk assessment</p>
             </div>
             <div className="glass-effect p-4 rounded-lg text-center">
-              <h3 className="font-semibold mb-2">Real-time Data</h3>
-              <p className="text-sm text-muted-foreground">Live market information</p>
+              <h3 className="font-semibold mb-2">Trade Alerts</h3>
+              <p className="text-sm text-muted-foreground">Smart trading notifications</p>
+            </div>
+            <div className="glass-effect p-4 rounded-lg text-center">
+              <h3 className="font-semibold mb-2">Export Reports</h3>
+              <p className="text-sm text-muted-foreground">Download trading reports</p>
             </div>
           </div>
         </div>
