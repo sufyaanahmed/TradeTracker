@@ -2,7 +2,7 @@
 import { MongoClient } from 'mongodb';
 
 export default async function handler(req, res) {
-  const mongoUri = process.env.MONGODB_URI;
+  const mongoUri = process.env.MONGO_URL;
 
   if (req.method === 'POST') {
     try {
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
       }
 
       if (!mongoUri) {
-        console.error('MONGODB_URI environment variable is not set');
+        console.error('MONGO_URL environment variable is not set');
         return res.status(500).json({ error: 'Database connection not configured' });
       }
       

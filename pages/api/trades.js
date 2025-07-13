@@ -44,13 +44,13 @@ export default async function handler(req, res) {
   const userId = authResult.uid;
 
   // These environment variables are for server-side only
-  const mongoUri = process.env.MONGODB_URI;
+  const mongoUri = process.env.MONGO_URL;
 
   if (req.method === 'GET') {
     // Handle GET request - fetch trades for authenticated user (GET /trades)
     try {
       if (!mongoUri) {
-        console.error('MONGODB_URI environment variable is not set');
+        console.error('MONGO_URL environment variable is not set');
         return res.status(500).json({ error: 'Database connection not configured' });
       }
 

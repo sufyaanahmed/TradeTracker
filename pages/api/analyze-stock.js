@@ -77,7 +77,7 @@ export default async function handler(req, res) {
     if (isPortfolioAnalysis) {
       // Portfolio Analysis - Get user's trades and analyze them
       try {
-        const mongoUri = process.env.MONGODB_URI;
+        const mongoUri = process.env.MONGO_URL;
         
         if (!mongoUri) {
           throw new Error('Database connection not configured');
