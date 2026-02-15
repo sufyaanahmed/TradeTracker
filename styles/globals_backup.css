@@ -1,77 +1,87 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ================= BASE ================= */
 @layer base {
-  :root {
-    --primary: #256af4;
-    --background-light: #f5f6f8;
-    --background-dark: #101622;
-    --text-primary: #0d121c;
-    --text-secondary: #49659c;
-    --text-muted: #94a3b8;
-    --border-light: #e2e8f0;
-    --border-dark: #2d3748;
-    --neon-blue: #00f0ff;
-    --neon-purple: #bf00ff;
-    --cyber-darker: #0f172a;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  body {
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    background-color: #0f172a;
+    background-image: 
+      linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-attachment: fixed;
   }
 
   html {
     scroll-behavior: smooth;
   }
 
-  body {
-    font-family: Inter, system-ui, -apple-system, sans-serif;
-    min-height: 100vh;
-    background-color: #0f172a;
-    background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-    background-attachment: fixed;
-    color: white;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: 700;
-    letter-spacing: -0.025em;
-  }
-
-  h1 {
-    font-size: 2.25rem;
-    font-weight: 900;
-  }
-
-  h2 {
-    font-size: 1.5rem;
-    font-weight: 800;
-  }
-
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 700;
-  }
-}
-
-@layer components {
   .hero-pattern {
     background-color: #f5f6f8;
-    background-image: radial-gradient(rgba(37, 106, 244, 0.06) 1px, transparent 1px);
+    background-image: radial-gradient(#256af410 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    letter-spacing: -0.025em;
+  }
+
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
+
+/* ================= MEDIA QUERIES (MUST BE OUTSIDE LAYERS) ================= */
+
+@media (min-width: 768px) {
+  h1 { font-size: 3rem; }
+  h2 { font-size: 1.875rem; }
+  h3 { font-size: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  h1 { font-size: 3.75rem; }
+  h2 { font-size: 2.25rem; }
+}
+
+@media (max-width: 768px) {
+  .cyber-card {
+    padding: 16px;
+  }
+
+  .cyber-button {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+  }
+}
+
+/* ================= UTILITIES ================= */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-cyber-grid {
+    background-image: 
+      linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+}
+
+/* ================= COMPONENTS ================= */
+@layer components {
   .glass-effect {
     backdrop-filter: blur(12px);
     background: rgba(255, 255, 255, 0.05);
@@ -153,16 +163,11 @@
     color: #ef4444;
     font-weight: bold;
   }
-
-  .bg-cyber-grid {
-    background-image: linear-gradient(rgba(0, 240, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.1) 1px, transparent 1px);
-    background-size: 50px 50px;
-  }
 }
 
+/* ================= SCROLLBAR ================= */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -188,37 +193,3 @@
   outline-offset: 2px;
 }
 
-@media (min-width: 768px) {
-  h1 {
-    font-size: 3rem;
-  }
-  
-  h2 {
-    font-size: 1.875rem;
-  }
-  
-  h3 {
-    font-size: 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  h1 {
-    font-size: 3.75rem;
-  }
-  
-  h2 {
-    font-size: 2.25rem;
-  }
-}
-
-@media (max-width: 768px) {
-  .cyber-card {
-    padding: 16px;
-  }
-
-  .cyber-button {
-    padding: 8px 16px;
-    font-size: 0.875rem;
-  }
-}

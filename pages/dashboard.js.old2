@@ -1,0 +1,463 @@
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
+import { Button } from '../components/ui/Button';
+import { TrendingUp, DollarSign, Activity, LogOut, TrendingDown, BarChart3, Brain, AlertCircle, Plus } from 'lucide-react';
+import { getApiUrl, getApiHeaders } from '../lib/api';
+import AddTradeModal from '../components/modals/AddTradeModal';
+import QuantEvaluator from '../components/QuantEvaluator';
+
+export default function Dashboard() {
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [trades, setTrades] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [analysis, setAnalysis] = useState(null);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [showAddTradeModal, setShowAddTradeModal] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const uid = localStorage.getItem('uid');
+    const uname = localStorage.getItem('uname');
+    const accessToken = localStorage.getItem('accessToken');
+
+    if (!uid || !accessToken) {
+      router.push('/');
+      return;
+    }
+
+    setUser({ uid, uname, accessToken });
+    fetchTrades(uid);
+  }, [router]);
+
+  const fetchTrades = async (userId) => {
+    try {
+      setLoading(true);
+      const accessToken = localStorage.getItem('accessToken');
+      
+      if (!accessToken) {
+        console.error('No access token found');
+        router.push('/');
+        return;
+      }
+
+      const url = getApiUrl('/trades');
+      const headers = getApiHeaders(accessToken);
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: headers
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', response.status, errorText);
+        throw new Error(`Failed to fetch trades: ${response.status}`);
+      }
+      
+      const tradesData = await response.json();
+      setTrades(tradesData || []);
+    } catch (error) {
+      console.error('Error fetching trades:', error);
+      // Don't show alert on dashboard, just log the error
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const analyzeTrades = async () => {
+    if (!user) return;
+    
+    setAnalyzing(true);
+    try {
+      const accessToken = localStorage.getItem('accessToken');
+      const response = await fetch('/api/analyze-trades', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAnalysis(data.analysis);
+      } else {
+        console.error('Failed to analyze trades');
+      }
+    } catch (error) {
+      console.error('Error analyzing trades:', error);
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
+  const handleTradeAdded = () => {
+    fetchTrades(user.uid);
+    setAnalysis(null); // Clear analysis to reflect new data
+  };
+
+  const calculateStats = () => {
+    const totalTrades = trades.length;
+    const totalPnL = trades.reduce((sum, trade) => sum + (trade.pl || 0), 0);
+    const profitableTrades = trades.filter(t => t.pl > 0).length;
+    const winRate = totalTrades > 0 ? Math.round((profitableTrades / totalTrades) * 100) : 0;
+
+    return {
+      totalTrades,
+      totalPnL,
+      winRate
+    };
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('uid');
+    localStorage.removeItem('uname');
+    localStorage.removeItem('accessToken');
+    router.push('/');
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="loading-spinner"></div>
+      </div>
+    );
+  }
+
+  const stats = calculateStats();
+
+  return (
+    <div className="min-h-screen bg-cyber-darker p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold glow-text">TradeTracker Pro</h1>
+            <p className="text-muted-foreground">Welcome back, {user.uname}!</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button 
+              onClick={() => setShowAddTradeModal(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Trade
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2">
+              <LogOut size={20} />
+              Logout
+            </Button>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Trades</CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? '...' : stats.totalTrades}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.totalTrades === 0 ? 'Start by adding your first trade' : 'Total positions recorded'}
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total P&L</CardTitle>
+              {loading ? 
+                <DollarSign className="h-4 w-4 text-muted-foreground" /> :
+                (stats.totalPnL >= 0 ? 
+                  <TrendingUp className="h-4 w-4 text-green-500" /> : 
+                  <TrendingDown className="h-4 w-4 text-red-500" />
+                )
+              }
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${loading ? '' : (stats.totalPnL >= 0 ? 'profit-text' : 'loss-text')}`}>
+                {loading ? '...' : (
+                  `${stats.totalPnL >= 0 ? '+' : ''}$${stats.totalPnL.toFixed(2)}`
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Your trading performance
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Win Rate</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {loading ? '...' : `${stats.winRate}%`}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {stats.totalTrades === 0 ? 'Track your success rate' : 'Profitable trades ratio'}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quant Trade Evaluator */}
+        <div className="mb-8">
+          <QuantEvaluator />
+        </div>
+
+        {/* Trade Analysis Section */}
+        <div className="mb-8">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-neon-purple" />
+                  <CardTitle>AI Portfolio Analysis</CardTitle>
+                </div>
+                <Button
+                  onClick={analyzeTrades}
+                  disabled={analyzing || trades.length === 0}
+                  className="flex items-center gap-2"
+                >
+                  {analyzing ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <BarChart3 className="w-4 h-4" />
+                      Analyze Portfolio
+                    </>
+                  )}
+                </Button>
+              </div>
+              <CardDescription>
+                Get AI-powered insights on your trading performance and patterns
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {analysis ? (
+                <div className="space-y-4">
+                  {/* Verdict Card */}
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-semibold text-white">Portfolio Verdict</h3>
+                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        analysis.verdict.rating === 'Excellent' ? 'bg-green-600 text-white' :
+                        analysis.verdict.rating === 'Good' ? 'bg-blue-600 text-white' :
+                        analysis.verdict.rating === 'Needs Improvement' ? 'bg-yellow-600 text-white' :
+                        analysis.verdict.rating === 'No Data' ? 'bg-gray-600 text-white' :
+                        'bg-red-600 text-white'
+                      }`}>
+                        {analysis.verdict.rating}
+                      </div>
+                    </div>
+                    <p className="text-gray-300 text-sm">
+                      Confidence: {analysis.verdict.confidence}
+                    </p>
+                  </div>
+
+                  {/* Analysis Summary */}
+                  <div className="bg-gray-800 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-white mb-3">Analysis Summary</h3>
+                    <div className="prose prose-invert max-w-none">
+                      <pre className="whitespace-pre-wrap text-sm text-gray-300 font-sans">{analysis.summary}</pre>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-8">
+                  <AlertCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    {trades.length === 0 
+                      ? 'Add some trades to get AI-powered portfolio analysis' 
+                      : 'Click Analyze Portfolio to get comprehensive insights on your trading performance'
+                    }
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Card className="cursor-pointer hover:bg-card/80 transition-colors" onClick={() => router.push('/research')}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-neon-purple" />
+                Stock Research
+              </CardTitle>
+              <CardDescription>
+                Research stocks with AI-powered analysis
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full">Start Research</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:bg-card/80 transition-colors" onClick={() => setShowAddTradeModal(true)}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5 text-neon-blue" />
+                Add New Trade
+              </CardTitle>
+              <CardDescription>
+                Record your latest trade with detailed analysis
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full">Add Trade</Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Trades Preview */}
+        {!loading && trades.length > 0 && (
+          <div className="mb-8">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold">Recent Trades</h2>
+              <Button variant="outline" onClick={() => setShowAddTradeModal(true)}>
+                Add More Trades
+              </Button>
+            </div>
+            <div className="grid gap-4">
+              {trades.slice(0, 5).map((trade, index) => (
+                <Card key={index}>
+                  <CardContent className="flex justify-between items-center p-4">
+                    <div>
+                      <h3 className="font-semibold">{trade.name}</h3>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(trade.date).toLocaleDateString()} • {trade.exchange}
+                      </p>
+                      {trade.reason && (
+                        <p className="text-xs text-muted-foreground mt-1 max-w-md truncate">
+                          {trade.reason}
+                        </p>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <div className={`font-bold ${trade.pl >= 0 ? 'profit-text' : 'loss-text'}`}>
+                        {trade.pl >= 0 ? '+' : ''}${trade.pl.toFixed(2)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {trade.pl >= 0 ? 'Profit' : 'Loss'}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Performance Insights */}
+        {!loading && trades.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-xl font-bold mb-4">Performance Insights</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Best Performing Stock</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const stockPerformance = {};
+                    trades.forEach(trade => {
+                      if (!stockPerformance[trade.name]) {
+                        stockPerformance[trade.name] = 0;
+                      }
+                      stockPerformance[trade.name] += trade.pl;
+                    });
+                    const bestStock = Object.entries(stockPerformance).reduce((a, b) => 
+                      stockPerformance[a[0]] > stockPerformance[b[0]] ? a : b
+                    );
+                    return (
+                      <div>
+                        <div className="font-semibold">{bestStock[0]}</div>
+                        <div className="text-sm profit-text">+${bestStock[1].toFixed(2)}</div>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Recent Streak</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const recentTrades = trades.slice(0, 5);
+                    const wins = recentTrades.filter(t => t.pl > 0).length;
+                    const losses = recentTrades.filter(t => t.pl < 0).length;
+                    return (
+                      <div>
+                        <div className="font-semibold">{wins}W - {losses}L</div>
+                        <div className="text-sm text-muted-foreground">Last 5 trades</div>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm">Average Trade</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {(() => {
+                    const avgTrade = trades.reduce((sum, trade) => sum + trade.pl, 0) / trades.length;
+                    return (
+                      <div>
+                        <div className={`font-semibold ${avgTrade >= 0 ? 'profit-text' : 'loss-text'}`}>
+                          {avgTrade >= 0 ? '+' : ''}${avgTrade.toFixed(2)}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Per trade</div>
+                      </div>
+                    );
+                  })()}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && trades.length === 0 && (
+          <div className="text-center py-12">
+            <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+            <h2 className="text-2xl font-bold mb-2">Start Your Trading Journey</h2>
+            <p className="text-muted-foreground mb-6">
+              Add your first trade to begin tracking your performance and get AI-powered insights
+            </p>
+            <Button onClick={() => setShowAddTradeModal(true)} className="mr-4">
+              Add Your First Trade
+            </Button>
+            <Button variant="outline" onClick={() => router.push('/research')}>
+              Research Stocks
+            </Button>
+          </div>
+        )}
+
+        {/* Add Trade Modal */}
+        <AddTradeModal 
+          isOpen={showAddTradeModal}
+          onClose={() => setShowAddTradeModal(false)}
+          onTradeAdded={handleTradeAdded}
+        />
+      </div>
+    </div>
+  );
+} 

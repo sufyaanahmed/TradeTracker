@@ -1,63 +1,47 @@
-// This is a serverless function for creating trades (POST /trade)
-import { MongoClient } from 'mongodb';
+// Serverless function for creating trades (POST /trade)
+// Security: userId extracted from verified JWT token, never from request body
+import { authenticate } from '../../lib/auth';
+import { connectToDatabase } from '../../lib/db';
 
 export default async function handler(req, res) {
-  const mongoUri = process.env.MONGO_URL;
-
-  if (req.method === 'POST') {
-    try {
-      const { name, date, reason, pl, exchange, userId } = req.body;
-      
-      // Validate required fields including userId
-      if (!name || !date || !reason || pl === undefined) {
-        return res.status(400).json({ error: 'Missing required fields: name, date, reason, or pl' });
-      }
-      
-      // Validate userId is present and not null/empty
-      if (!userId) {
-        return res.status(400).json({ error: 'Missing required field: userId' });
-      }
-
-      if (!mongoUri) {
-        console.error('MONGO_URL environment variable is not set');
-        return res.status(500).json({ error: 'Database connection not configured' });
-      }
-      
-      // MongoDB connection options optimized for serverless with TLS
-      const client = new MongoClient(mongoUri, {
-        maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-        connectTimeoutMS: 30000,
-        maxIdleTimeMS: 30000,
-        tls: true,
-        tlsAllowInvalidCertificates: false,
-        tlsAllowInvalidHostnames: false,
-      });
-
-      await client.connect();
-      const db = client.db(); // Use default database from connection string
-      const trade = await db.collection('trades').insertOne({
-        name,
-        date,
-        reason,
-        pl: parseFloat(pl),
-        exchange,
-        userId: userId // Always use the userId from request body
-      });
-      await client.close();
-      
-      res.status(201).json(trade);
-    } catch (error) {
-      console.error('Error adding trade:', error);
-      console.error('MongoDB URI exists:', !!mongoUri);
-      res.status(500).json({ 
-        error: 'Failed to add trade', 
-        details: error.message 
-      });
-    }
-  } else {
+  if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
-    res.status(405).end(`Method ${req.method} Not Allowed`);
+    return res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+
+  // Authenticate and extract userId from token
+  const auth = await authenticate(req);
+  if (auth.error) {
+    return res.status(auth.status).json({ error: auth.error });
+  }
+  const userId = auth.uid;
+
+  try {
+    const { name, date, reason, pl, exchange } = req.body;
+
+    if (!name || !date || !reason || pl === undefined) {
+      return res.status(400).json({ error: 'Missing required fields: name, date, reason, or pl' });
+    }
+
+    const { db } = await connectToDatabase();
+    const trade = await db.collection('trades').insertOne({
+      name: name.toUpperCase(),
+      date,
+      reason,
+      pl: parseFloat(pl),
+      exchange: exchange || 'NASDAQ',
+      userId, // Always from verified JWT
+      createdAt: new Date().toISOString()
+    });
+
+    console.log('[trade] ✅ Trade added for user:', userId, '| Symbol:', name);
+    res.status(201).json({ insertedId: trade.insertedId });
+  } catch (error) {
+    console.error('[trade] ❌ Error:', error.message);
+    res.status(500).json({
+      error: 'Database connection failed. Check MongoDB Atlas connection.',
+      details: error.message,
+      code: error.code
+    });
   }
 } 
