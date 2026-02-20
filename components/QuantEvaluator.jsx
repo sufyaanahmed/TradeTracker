@@ -13,10 +13,12 @@ export default function QuantEvaluator() {
     setError(null);
     
     try {
+      const token = localStorage.getItem('firebase_token');
       const response = await fetch('/api/evaluate-trade-intent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ text: tradeIntent }),
       });
@@ -52,29 +54,29 @@ export default function QuantEvaluator() {
   };
 
   return (
-    <div className="bg-slate-900 text-white rounded-xl shadow-xl p-6 border border-slate-800 flex flex-col gap-6">
+    <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-3">
         <span className="material-symbols-outlined text-primary">auto_awesome</span>
-        <h2 className="text-lg font-bold">AI Quant Decision Engine</h2>
+        <h2 className="text-lg font-bold text-slate-900 dark:text-white">AI Quant Decision Engine</h2>
       </div>
 
       {/* Input Section */}
       <div className="space-y-3">
-        <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
           Trade Intent (Natural Language)
         </label>
         <textarea
           value={tradeIntent}
           onChange={(e) => setTradeIntent(e.target.value)}
           placeholder="e.g., Buy 20 shares of AAPL at market price"
-          className="w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-slate-900 dark:text-white placeholder:text-slate-500"
           rows={3}
         />
         <button
           onClick={analyzeIntent}
           disabled={loading || !tradeIntent.trim()}
-          className="w-full py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-bold transition-colors"
+          className="w-full py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-bold text-white transition-colors"
         >
           {loading ? 'Analyzing...' : 'Analyze Trade Intent'}
         </button>
@@ -82,8 +84,8 @@ export default function QuantEvaluator() {
 
       {/* Error State */}
       {error && (
-        <div className="p-4 bg-red-900/20 border border-red-800/50 rounded-lg">
-          <p className="text-sm text-red-400">{error}</p>
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-lg">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}
 
@@ -91,9 +93,9 @@ export default function QuantEvaluator() {
       {result && (
         <div className="space-y-6">
           {/* Parsed Intent */}
-          <div className="p-4 bg-slate-800/50 rounded-lg border border-slate-700">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-200 dark:border-slate-700">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-xs font-bold text-slate-400 uppercase">Parsed Intent</span>
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Parsed Intent</span>
               <span className={`px-2.5 py-1 rounded-full text-xs font-bold ${
                 result.parsedIntent.action === 'BUY' 
                   ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
@@ -102,15 +104,15 @@ export default function QuantEvaluator() {
                 {result.parsedIntent.action}
               </span>
             </div>
-            <p className="text-sm text-slate-300">
-              {result.parsedIntent.quantity} shares of <span className="font-bold text-white">{result.parsedIntent.symbol}</span>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              {result.parsedIntent.quantity} shares of <span className="font-bold text-slate-900 dark:text-white">{result.parsedIntent.symbol}</span>
               {result.parsedIntent.targetPrice && ` at $${result.parsedIntent.targetPrice}`}
             </p>
           </div>
 
           {/* Recommendation Badge */}
           <div className="flex justify-between items-center">
-            <span className="text-xs font-bold text-slate-400 uppercase">Recommendation</span>
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Recommendation</span>
             <span className={`px-3 py-1.5 rounded-full text-sm font-bold ${getRecommendationColor(result.quantScore.recommendation)}`}>
               {result.quantScore.recommendation}
             </span>
@@ -119,12 +121,12 @@ export default function QuantEvaluator() {
           {/* Total Score */}
           <div>
             <div className="flex justify-between text-xs font-bold mb-2">
-              <span className="text-slate-400">QUANT SCORE</span>
+              <span className="text-slate-500 dark:text-slate-400">QUANT SCORE</span>
               <span className={getScoreColor(result.quantScore.totalScore)}>
                 {result.quantScore.totalScore.toFixed(1)}/100
               </span>
             </div>
-            <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-primary rounded-full transition-all duration-500"
                 style={{ width: `${result.quantScore.totalScore}%` }}
@@ -134,11 +136,11 @@ export default function QuantEvaluator() {
 
           {/* Factor Breakdown */}
           <div className="flex flex-col gap-4">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Factor Breakdown</h3>
+            <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Factor Breakdown</h3>
             <ul className="flex flex-col gap-3">
               {Object.entries(result.quantScore.breakdown).map(([factor, data]) => (
                 <li key={factor} className="flex justify-between items-center text-sm">
-                  <span className="text-slate-300 capitalize">{factor.replace(/([A-Z])/g, ' $1').trim()}</span>
+                  <span className="text-slate-600 dark:text-slate-300 capitalize">{factor.replace(/([A-Z])/g, ' $1').trim()}</span>
                   <span className={`font-bold ${getScoreColor(data.score)}`}>
                     {data.score.toFixed(1)}
                   </span>
@@ -168,13 +170,17 @@ export default function QuantEvaluator() {
             <ul className="flex flex-col gap-3">
               <li className="flex gap-3 text-sm">
                 <span className="material-symbols-outlined text-primary text-lg">account_balance</span>
-                <span>Position Size: {result.riskMetrics.positionSizePercent.toFixed(1)}% of portfolio</span>
+                <span>Position Size: {(result.riskMetrics.positionSizePercent || 0).toFixed(1)}% of portfolio</span>
               </li>
               <li className="flex gap-3 text-sm">
                 <span className="material-symbols-outlined text-primary text-lg">pie_chart</span>
-                <span>HHI Concentration: {result.riskMetrics.concentrationRisk.toFixed(2)}</span>
+                <span>Risk Level: {result.riskMetrics.concentrationRisk || 'UNKNOWN'}</span>
               </li>
-              {result.portfolioStats && (
+              <li className="flex gap-3 text-sm">
+                <span className="material-symbols-outlined text-primary text-lg">analytics</span>
+                <span>HHI Index: {result.riskMetrics.hhiAfter || 'N/A'}</span>
+              </li>
+              {result.portfolioStats && result.portfolioStats.winRate !== undefined && (
                 <li className="flex gap-3 text-sm">
                   <span className="material-symbols-outlined text-emerald-400 text-lg">trending_up</span>
                   <span>Portfolio Win Rate: {result.portfolioStats.winRate.toFixed(1)}%</span>

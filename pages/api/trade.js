@@ -3,6 +3,21 @@
 import { authenticate } from '../../lib/auth';
 import { connectToDatabase } from '../../lib/db';
 
+// Clear portfolio cache when trades are modified
+function clearPortfolioCache(userId) {
+  try {
+    // This will be picked up by the evaluate-trade-intent cache system
+    const { portfolioCache } = require('./evaluate-trade-intent');
+    if (portfolioCache && portfolioCache.delete) {
+      portfolioCache.delete(userId);
+      console.log('[trade] Cache cleared for user:', userId);
+    }
+  } catch (error) {
+    // Cache clearing is not critical, just log
+    console.log('[trade] Cache clear not available:', error.message);
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
@@ -35,6 +50,10 @@ export default async function handler(req, res) {
     });
 
     console.log('[trade] ✅ Trade added for user:', userId, '| Symbol:', name);
+    
+    // Clear portfolio cache to ensure fresh data for next analysis
+    clearPortfolioCache(userId);
+    
     res.status(201).json({ insertedId: trade.insertedId });
   } catch (error) {
     console.error('[trade] ❌ Error:', error.message);

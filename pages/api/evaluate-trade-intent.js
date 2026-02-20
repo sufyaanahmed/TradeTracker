@@ -20,6 +20,26 @@ import { computePortfolioStats } from '../../lib/portfolio-metrics';
 
 const ALPHA_VANTAGE_BASE = 'https://www.alphavantage.co/query';
 
+// Simple in-memory cache for portfolio data (5 minutes TTL)
+const portfolioCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getCachedPortfolio(userId) {
+  const cached = portfolioCache.get(userId);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    console.log('[quant] Using cached portfolio data');
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedPortfolio(userId, data) {
+  portfolioCache.set(userId, {
+    data,
+    timestamp: Date.now()
+  });
+}
+
 async function fetchAlphaVantage(fn, symbol) {
   const key = process.env.ALPHA_VANTAGE_API_KEY;
   if (!key) return null;
@@ -148,37 +168,120 @@ export default async function handler(req, res) {
       });
     }
 
-    // 4. Get user's portfolio from MongoDB
-    let portfolio = [];
-    try {
-      const { db } = await connectToDatabase();
-      portfolio = await db.collection('trades').find({ userId }).sort({ date: -1 }).toArray();
-      console.log('[quant] Portfolio has', portfolio.length, 'trades');
-    } catch (dbError) {
-      console.error('[quant] DB error (continuing without portfolio):', dbError.message);
+    // 4. Get user's portfolio from MongoDB (with caching)
+    //    Normalise both legacy and new-schema trades so downstream
+    //    libs (portfolio-metrics, risk-engine) see { name, pl, date }.
+    let portfolio = getCachedPortfolio(userId);
+    
+    if (!portfolio) {
+      try {
+        const { db } = await connectToDatabase();
+        const raw = await db.collection('trades').find({ userId: userId }).sort({ date: -1 }).toArray();
+        portfolio = raw.map(t => ({
+          ...t,
+          // Normalise symbol → name (old libs use t.name)
+          name: t.name || t.symbol || 'UNKNOWN',
+          symbol: t.symbol || t.name || 'UNKNOWN',
+          // Normalise P&L: new CLOSED trades store realizedPnL, legacy stores pl
+          pl: t.pl ?? t.realizedPnL ?? 0,
+          // Normalise date
+          date: t.date || t.exitDate || t.entryDate || new Date().toISOString(),
+        }));
+        setCachedPortfolio(userId, portfolio);
+        console.log('[quant] Fetched and cached portfolio with', portfolio.length, 'trades');
+      } catch (dbError) {
+        console.error('[quant] DB error (continuing without portfolio):', dbError.message);
+        portfolio = [];
+      }
     }
 
-    // 5. Compute all factor scores
-    const fundamental = computeFundamentalScore(overview);
-    const technical = computeTechnicalScore(quote, overview);
-    const sector = computeSectorScore(overview);
-    const sentiment = await computeSentimentScore(intent.symbol, overview);
-    const portfolioFit = computePortfolioFitScore(intent, portfolio);
+    // 5. Compute all factor scores with error handling
+    let fundamental, technical, sector, sentiment, portfolioFit;
+    
+    try {
+      fundamental = computeFundamentalScore(overview);
+    } catch (err) {
+      console.error('[quant] Fundamental analysis error:', err.message);
+      fundamental = { score: 50, breakdown: {}, error: 'Analysis failed' };
+    }
+    
+    try {
+      technical = computeTechnicalScore(quote, overview);
+    } catch (err) {
+      console.error('[quant] Technical analysis error:', err.message);
+      technical = { score: 50, breakdown: {}, error: 'Analysis failed' };
+    }
+    
+    try {
+      sector = computeSectorScore(overview);
+    } catch (err) {
+      console.error('[quant] Sector analysis error:', err.message);
+      sector = { score: 50, breakdown: {}, sector: 'Unknown', error: 'Analysis failed' };
+    }
+    
+    try {
+      sentiment = await computeSentimentScore(intent.symbol, overview);
+    } catch (err) {
+      console.error('[quant] Sentiment analysis error:', err.message);
+      sentiment = { score: 55, breakdown: {}, brief: 'Sentiment analysis unavailable', error: err.message };
+    }
+    
+    try {
+      portfolioFit = computePortfolioFitScore(intent, portfolio);
+    } catch (err) {
+      console.error('[quant] Portfolio fit error:', err.message);
+      portfolioFit = { score: 50, breakdown: {}, error: 'Analysis failed' };
+    }
 
     // 6. Aggregate quant score
-    const quantResult = computeQuantScore(
-      fundamental.score,
-      technical.score,
-      sector.score,
-      sentiment.score,
-      portfolioFit.score
-    );
+    let quantResult;
+    try {
+      quantResult = computeQuantScore(
+        fundamental.score || 50,
+        technical.score || 50,
+        sector.score || 50,
+        sentiment.score || 55,
+        portfolioFit.score || 50
+      );
+    } catch (err) {
+      console.error('[quant] Quant score computation error:', err.message);
+      quantResult = {
+        totalScore: 50,
+        recommendation: 'NEUTRAL',
+        confidence: 'LOW',
+        error: 'Score computation failed'
+      };
+    }
 
     // 7. Compute risk metrics
-    const riskMetrics = computeRiskMetrics(intent, portfolio, quote, overview);
+    let riskMetrics;
+    try {
+      riskMetrics = computeRiskMetrics(intent, portfolio, quote, overview);
+    } catch (err) {
+      console.error('[quant] Risk metrics error:', err.message);
+      riskMetrics = {
+        positionSizePercent: 0,
+        concentrationRisk: 'UNKNOWN',
+        hhiAfter: 0,
+        riskViolation: false,
+        violations: [],
+        error: err.message
+      };
+    }
 
     // 8. Portfolio stats
-    const portfolioStats = computePortfolioStats(portfolio);
+    let portfolioStats;
+    try {
+      portfolioStats = computePortfolioStats(portfolio);
+    } catch (err) {
+      console.error('[quant] Portfolio stats error:', err.message);
+      portfolioStats = {
+        totalTrades: portfolio.length || 0,
+        winRate: 0,
+        totalPL: 0,
+        error: err.message
+      };
+    }
 
     // 9. Generate summary
     const summary = generateSummary(intent, quantResult, riskMetrics, fundamental, technical, sector, sentiment);

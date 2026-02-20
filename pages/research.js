@@ -1,28 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { withAuth, useAuth } from '../lib/AuthContext';
 
-export default function Research() {
+function Research() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
   const [searchSymbol, setSearchSymbol] = useState('');
   const [stockData, setStockData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
-
-  useEffect(() => {
-    const uid = localStorage.getItem('uid');
-    const uname = localStorage.getItem('uname');
-    const accessToken = localStorage.getItem('accessToken');
-
-    if (!uid || !accessToken) {
-      router.push('/');
-      return;
-    }
-
-    setUser({ uid, uname, accessToken });
-  }, [router]);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -33,7 +21,7 @@ export default function Research() {
       setStockData(null);
       setAiAnalysis(null);
       
-      const accessToken = localStorage.getItem('accessToken');
+      const accessToken = localStorage.getItem('firebase_token');
       const response = await fetch(`/api/stock-data?symbol=${searchSymbol.toUpperCase()}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
@@ -75,11 +63,15 @@ export default function Research() {
     }
   };
 
-  const handleSignOut = () => {
-    localStorage.removeItem('uid');
-    localStorage.removeItem('uname');
-    localStorage.removeItem('accessToken');
-    router.push('/');
+  const handleSignOut = async () => {
+    try {
+      const { getAuth, signOut } = await import('firebase/auth');
+      const auth = getAuth();
+      await signOut(auth);
+      router.push('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (
@@ -172,36 +164,36 @@ export default function Research() {
                   <div className="flex items-start gap-4">
                     <div className="size-14 rounded-xl bg-slate-900 flex items-center justify-center text-white shrink-0">
                       <span className="material-symbols-outlined text-3xl">
-                        {stockData.quote?.symbol?.charAt(0) || 'S'}
+                        {stockData.symbol?.charAt(0) || 'S'}
                       </span>
                     </div>
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <h2 className="text-2xl font-bold">{stockData.overview?.Name || searchSymbol}</h2>
+                        <h2 className="text-2xl font-bold">{stockData.symbol || searchSymbol}</h2>
                         <span className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs font-bold">
-                          {stockData.overview?.Exchange || 'NASDAQ'}: {stockData.quote?.symbol || searchSymbol}
+                          NASDAQ: {stockData.symbol || searchSymbol}
                         </span>
                       </div>
                       <p className="text-slate-500 text-sm">
-                        {stockData.overview?.Industry || 'Technology'} • {stockData.overview?.Country || 'US'}
+                        Technology • US
                       </p>
                     </div>
                   </div>
                   <div className="flex items-end md:text-right flex-row md:flex-col justify-between md:justify-center gap-2">
                     <div className="text-3xl font-bold tracking-tight">
-                      ${stockData.quote?.price?.toFixed(2) || '0.00'}
+                      ${stockData.price?.toFixed(2) || '0.00'}
                     </div>
                     <div className={`flex items-center gap-1 font-semibold ${
-                      (stockData.quote?.changePercent || 0) >= 0 
+                      (stockData.change || 0) >= 0 
                         ? 'text-emerald-600' 
                         : 'text-red-600'
                     }`}>
                       <span className="material-symbols-outlined text-sm">
-                        {(stockData.quote?.changePercent || 0) >= 0 ? 'trending_up' : 'trending_down'}
+                        {(stockData.change || 0) >= 0 ? 'trending_up' : 'trending_down'}
                       </span>
-                      <span>{(stockData.quote?.changePercent || 0) >= 0 ? '+' : ''}{stockData.quote?.changePercent?.toFixed(2)}%</span>
+                      <span>{(stockData.change || 0) >= 0 ? '+' : ''}{stockData.changePercent || '0%'}</span>
                       <span className="text-slate-400 font-normal ml-1">
-                        {(stockData.quote?.change || 0) >= 0 ? '+' : ''}${stockData.quote?.change?.toFixed(2)} Today
+                        {(stockData.change || 0) >= 0 ? '+' : ''}${stockData.change?.toFixed(2) || '0.00'} Today
                       </span>
                     </div>
                   </div>
@@ -211,27 +203,23 @@ export default function Research() {
                 <div className="bg-slate-50 border-t border-slate-100 px-6 py-4 flex flex-wrap gap-8">
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Market Cap</span>
-                    <span className="text-sm font-semibold">
-                      {stockData.overview?.MarketCapitalization 
-                        ? `$${(parseFloat(stockData.overview.MarketCapitalization) / 1e12).toFixed(2)}T`
-                        : 'N/A'}
-                    </span>
+                    <span className="text-sm font-semibold">N/A</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">P/E Ratio</span>
-                    <span className="text-sm font-semibold">{stockData.overview?.PERatio || 'N/A'}</span>
+                    <span className="text-sm font-semibold">N/A</span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">52W Range</span>
                     <span className="text-sm font-semibold">
-                      ${stockData.overview?.['52WeekLow'] || '0'} - ${stockData.overview?.['52WeekHigh'] || '0'}
+                      ${stockData.low?.toFixed(2) || '0'} - ${stockData.high?.toFixed(2) || '0'}
                     </span>
                   </div>
                   <div className="flex flex-col">
                     <span className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Volume</span>
                     <span className="text-sm font-semibold">
-                      {stockData.quote?.volume 
-                        ? `${(stockData.quote.volume / 1e6).toFixed(1)}M`
+                      {stockData.volume 
+                        ? `${(stockData.volume / 1e6).toFixed(1)}M`
                         : 'N/A'}
                     </span>
                   </div>
@@ -419,3 +407,5 @@ export default function Research() {
     </>
   );
 }
+
+export default withAuth(Research);

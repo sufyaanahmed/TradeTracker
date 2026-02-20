@@ -267,8 +267,60 @@ Write this as a professional portfolio analysis report. Be specific, actionable,
 
     // Individual Stock Analysis
     // Fetch real data from Alpha Vantage
+    // Get real stock data - use appropriate data source based on exchange
     let realDataSection = '';
-    if (alphaVantageKey) {
+    
+    // Check if Indian exchange - use screener.in
+    if (['NSE', 'BSE'].includes(exchange)) {
+      try {
+        console.log(`Fetching Indian stock data for ${stockSymbol} from screener.in...`);
+        
+        const screenerResponse = await fetch(`http://localhost:3001/api/indian-stock-data?symbol=${stockSymbol}&exchange=${exchange}`, {
+          headers: {
+            'Authorization': req.headers.authorization
+          }
+        });
+        
+        if (screenerResponse.ok) {
+          const screenerData = await screenerResponse.json();
+          const data = screenerData.data;
+
+          realDataSection = 
+`**REAL MARKET DATA (Screener.in):**
+**Company:** ${data.companyName} (${data.symbol})
+**Exchange:** ${exchange}
+**Source:** screener.in
+
+**Current Price Data:**
+- Current Price: ₹${data.currentPrice}
+- Market Cap: ₹${data.marketCap}
+
+**Key Financial Metrics:**
+- P/E Ratio: ${data.peRatio}
+- Book Value: ₹${data.bookValue}
+- ROE: ${data.roe}%
+- Debt to Equity: ${data.debtToEquity}
+- Dividend Yield: ${data.dividendYield}%
+
+**Business Performance:**
+- Sales: ₹${data.sales}
+- Net Profit: ₹${data.profit}
+- Sales Growth: ${data.quarterlyGrowth}
+- Profit Growth: ${data.profitGrowth}
+
+**Note:** This data is sourced from screener.in for Indian stocks (${exchange}).`;
+
+        } else {
+          const error = await screenerResponse.json();
+          realDataSection = `**Indian Stock Data:** Unable to fetch data for ${stockSymbol} on ${exchange}. ${error.error || 'Please verify the stock symbol.'}`;
+        }
+      } catch (error) {
+        console.error('Error fetching Indian stock data:', error);
+        realDataSection = `**Indian Stock Data:** Error fetching data for ${stockSymbol} from screener.in. The stock may not be listed or the symbol may be incorrect.`;
+      }
+    }
+    // For international stocks, use Alpha Vantage
+    else if (alphaVantageKey) {
       try {
         console.log('Fetching real data from Alpha Vantage...');
         
