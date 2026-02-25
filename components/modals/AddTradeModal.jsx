@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { X, Plus, Zap } from 'lucide-react';
+import InvestmentThesisForm from '../research/InvestmentThesisForm';
 
 export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
     exchange: 'NASDAQ',
     reason: '',
   });
+  const [thesis, setThesis] = useState({});
   const [loading, setLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [analysisLoading, setAnalysisLoading] = useState(false);
@@ -44,6 +46,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
           quantity: parseInt(form.quantity),
           exchange: form.exchange,
           reason: form.reason,
+          thesis: Object.keys(thesis).length > 0 ? thesis : undefined,
         }),
       });
 
@@ -51,6 +54,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
 
       if (response.ok) {
         setForm({ symbol: '', type: 'LONG', entryPrice: '', quantity: '', exchange: 'NASDAQ', reason: '' });
+        setThesis({});
         setAiAnalysis(null);
         if (onTradeAdded) onTradeAdded(data);
         onClose();
@@ -234,6 +238,9 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
               </div>
             </div>
           )}
+
+          {/* Investment Thesis (collapsible) */}
+          <InvestmentThesisForm thesis={thesis} onChange={setThesis} />
 
           {/* Trade Value Preview */}
           {form.entryPrice && form.quantity && (

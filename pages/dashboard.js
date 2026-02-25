@@ -4,6 +4,7 @@ import Head from 'next/head';
 import QuantEvaluator from '../components/QuantEvaluator';
 import AddTradeModal from '../components/modals/AddTradeModal';
 import ExitTradeModal from '../components/modals/ExitTradeModal';
+import TradeIdeasPanel from '../components/research/TradeIdeasPanel';
 import { withAuth, useAuth } from '../lib/AuthContext';
 import { getAuth, signOut } from 'firebase/auth';
 import dynamic from 'next/dynamic';
@@ -14,7 +15,9 @@ const AssetAllocationChart = dynamic(() => import('../components/Charts').then(m
 const WinRateChart = dynamic(() => import('../components/Charts').then(mod => ({ default: mod.WinRateChart })), { ssr: false });
 
 // Polling interval for live P&L (ms)
-const POLL_INTERVAL = 10_000;
+// Disabled auto-polling to avoid Alpha Vantage rate limits (25 req/day)
+// Set to null to disable, or increase to 5+ minutes to minimize API usage
+const POLL_INTERVAL = null; // was 10_000 (10 seconds)
 
 function Dashboard() {
   const router = useRouter();
@@ -100,10 +103,12 @@ function Dashboard() {
       await Promise.all([fetchActive(), fetchClosed()]);
     })();
 
-    // Live polling for active positions
-    pollRef.current = setInterval(() => {
-      fetchActive(true); // silent refresh
-    }, POLL_INTERVAL);
+    // Live polling for active positions (disabled to avoid rate limits)
+    if (POLL_INTERVAL) {
+      pollRef.current = setInterval(() => {
+        fetchActive(true); // silent refresh
+      }, POLL_INTERVAL);
+    }
 
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
@@ -147,7 +152,7 @@ function Dashboard() {
   return (
     <>
       <Head>
-        <title>Dashboard | AlphaTrade</title>
+        <title>Dashboard | Palrin</title>
       </Head>
 
       <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
@@ -156,10 +161,13 @@ function Dashboard() {
           <div className="flex items-center gap-8">
             <div className="flex items-center gap-2 text-primary">
               <span className="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">AlphaTrade</h2>
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Palrin</h2>
             </div>
             <nav className="hidden md:flex items-center gap-6">
               <a className="text-primary text-sm font-semibold border-b-2 border-primary pb-4 mt-4" href="/dashboard">Dashboard</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/company">Company</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/sectors">Sectors</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/macro">Macro</a>
               <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research">Research</a>
             </nav>
           </div>
@@ -413,10 +421,11 @@ function Dashboard() {
               </div>
             </div>
 
-            {/* Right: AI Quant + Tip */}
-            <aside className="w-full lg:w-80 flex-shrink-0">
+            {/* Right: AI Quant + Trade Ideas + Tip */}
+            <aside className="w-full lg:w-80 flex-shrink-0 space-y-6">
               <QuantEvaluator />
-              <div className="mt-6 p-6 bg-primary/10 border border-primary/20 rounded-xl">
+              <TradeIdeasPanel compact={true} />
+              <div className="p-6 bg-primary/10 border border-primary/20 rounded-xl">
                 <div className="flex items-center gap-2 mb-2 text-primary">
                   <span className="material-symbols-outlined text-xl">lightbulb</span>
                   <span className="font-bold text-sm">Trader Tip</span>

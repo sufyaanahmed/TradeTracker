@@ -1,7 +1,13 @@
 // POST /api/trades/create — Open a new ACTIVE position
-// Schema: { symbol, type, entryPrice, quantity, exchange, reason }
+// Schema: { symbol, type, entryPrice, quantity, exchange, reason, thesis }
 import { authenticate } from '../../../lib/auth';
 import { connectToDatabase } from '../../../lib/db';
+
+const VALID_TRADE_TYPES = ['swing', 'positional', 'intraday'];
+const VALID_THESIS_CATEGORIES = [
+  'macro_driven', 'sector_momentum', 'fundamental_growth',
+  'value_investing', 'technical_breakout', 'mean_reversion',
+];
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -14,7 +20,7 @@ export default async function handler(req, res) {
   const userId = auth.uid;
 
   try {
-    const { symbol, type, entryPrice, quantity, exchange, reason } = req.body;
+    const { symbol, type, entryPrice, quantity, exchange, reason, thesis } = req.body;
 
     // Validation
     const errors = [];
@@ -22,6 +28,16 @@ export default async function handler(req, res) {
     if (!['LONG', 'SHORT'].includes(type)) errors.push('type must be LONG or SHORT');
     if (!entryPrice || isNaN(parseFloat(entryPrice)) || parseFloat(entryPrice) <= 0) errors.push('entryPrice must be a positive number');
     if (!quantity || isNaN(parseInt(quantity)) || parseInt(quantity) <= 0) errors.push('quantity must be a positive integer');
+
+    // Validate thesis fields if provided
+    if (thesis) {
+      if (thesis.tradeType && !VALID_TRADE_TYPES.includes(thesis.tradeType)) {
+        errors.push(`tradeType must be one of: ${VALID_TRADE_TYPES.join(', ')}`);
+      }
+      if (thesis.thesisCategory && !VALID_THESIS_CATEGORIES.includes(thesis.thesisCategory)) {
+        errors.push(`thesisCategory must be one of: ${VALID_THESIS_CATEGORIES.join(', ')}`);
+      }
+    }
 
     if (errors.length > 0) {
       return res.status(400).json({ error: 'Validation failed', details: errors });
@@ -42,6 +58,17 @@ export default async function handler(req, res) {
       entryDate: new Date().toISOString(),
       exitDate: null,
       realizedPnL: null,
+      // Investment Thesis (Module 4)
+      thesis: thesis ? {
+        tradeType: thesis.tradeType || 'swing',
+        thesisCategory: thesis.thesisCategory || null,
+        thesisDescription: thesis.thesisDescription || '',
+        macroReason: thesis.macroReason || '',
+        sectorReason: thesis.sectorReason || '',
+        fundamentalReason: thesis.fundamentalReason || '',
+        riskFactors: thesis.riskFactors || '',
+        expectedCatalyst: thesis.expectedCatalyst || '',
+      } : null,
       createdAt: new Date().toISOString(),
     };
 
