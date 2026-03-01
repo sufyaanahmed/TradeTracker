@@ -39,7 +39,7 @@ export default function QuantEvaluator() {
   const getRecommendationColor = (recommendation) => {
     const colors = {
       'STRONG BUY': 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400',
-      'BUY': 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+      'BUY': 'bg-neutral-100 dark:bg-neutral-800/30 text-neutral-900 dark:text-neutral-400',
       'NEUTRAL': 'bg-slate-100 dark:bg-slate-800/30 text-slate-700 dark:text-slate-400',
       'AVOID': 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
     };
@@ -48,7 +48,7 @@ export default function QuantEvaluator() {
 
   const getScoreColor = (score) => {
     if (score >= 80) return 'text-emerald-600 dark:text-emerald-400';
-    if (score >= 60) return 'text-blue-600 dark:text-blue-400';
+    if (score >= 60) return 'text-black dark:text-neutral-400';
     if (score >= 40) return 'text-amber-600 dark:text-amber-400';
     return 'text-red-600 dark:text-red-400';
   };
@@ -57,7 +57,7 @@ export default function QuantEvaluator() {
     <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <span className="material-symbols-outlined text-primary">auto_awesome</span>
+        <span className="material-symbols-outlined text-black">auto_awesome</span>
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">AI Quant Decision Engine</h2>
       </div>
 
@@ -70,13 +70,13 @@ export default function QuantEvaluator() {
           value={tradeIntent}
           onChange={(e) => setTradeIntent(e.target.value)}
           placeholder="e.g., Buy 20 shares of AAPL at market price"
-          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none text-slate-900 dark:text-white placeholder:text-slate-500"
+          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-black transition-all resize-none text-slate-900 dark:text-white placeholder:text-slate-500"
           rows={3}
         />
         <button
           onClick={analyzeIntent}
           disabled={loading || !tradeIntent.trim()}
-          className="w-full py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-bold text-white transition-colors"
+          className="w-full py-3 bg-black hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg text-sm font-bold text-white transition-colors"
         >
           {loading ? 'Analyzing...' : 'Analyze Trade Intent'}
         </button>
@@ -128,7 +128,7 @@ export default function QuantEvaluator() {
             </div>
             <div className="h-2 w-full bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-primary rounded-full transition-all duration-500"
+                className="h-full bg-black rounded-full transition-all duration-500"
                 style={{ width: `${result.quantScore.totalScore}%` }}
               ></div>
             </div>
@@ -169,15 +169,15 @@ export default function QuantEvaluator() {
             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest">Key Insights</h3>
             <ul className="flex flex-col gap-3">
               <li className="flex gap-3 text-sm">
-                <span className="material-symbols-outlined text-primary text-lg">account_balance</span>
+                <span className="material-symbols-outlined text-black text-lg">account_balance</span>
                 <span>Position Size: {(result.riskMetrics.positionSizePercent || 0).toFixed(1)}% of portfolio</span>
               </li>
               <li className="flex gap-3 text-sm">
-                <span className="material-symbols-outlined text-primary text-lg">pie_chart</span>
+                <span className="material-symbols-outlined text-black text-lg">pie_chart</span>
                 <span>Risk Level: {result.riskMetrics.concentrationRisk || 'UNKNOWN'}</span>
               </li>
               <li className="flex gap-3 text-sm">
-                <span className="material-symbols-outlined text-primary text-lg">analytics</span>
+                <span className="material-symbols-outlined text-black text-lg">analytics</span>
                 <span>HHI Index: {result.riskMetrics.hhiAfter || 'N/A'}</span>
               </li>
               {result.portfolioStats && result.portfolioStats.winRate !== undefined && (

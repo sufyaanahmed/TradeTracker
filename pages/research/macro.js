@@ -51,20 +51,20 @@ function MacroDashboard() {
         <title>Macro Economics | Palrin</title>
       </Head>
 
-      <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+      <div className="relative flex min-h-screen w-full flex-col bg-neutral-50 dark:bg-neutral-950 font-display text-neutral-950 dark:text-white">
         {/* Top Nav */}
-        <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-50">
+        <header className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-6 py-3 sticky top-0 z-50">
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 text-primary">
-              <span className="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Palrin</h2>
+            <div className="flex items-center gap-3">
+              <img src="/Palrin.png" alt="Palrin" width="28" height="28" className="rounded" />
+              <h2 className="text-xl font-semibold tracking-tight text-neutral-950 dark:text-white">Palrin</h2>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/dashboard">Dashboard</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/company">Company</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/sectors">Sectors</a>
-              <a className="text-primary text-sm font-semibold border-b-2 border-primary pb-4 mt-4" href="/research/macro">Macro</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research">Legacy Research</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/dashboard">Dashboard</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/company">Company</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/sectors">Sectors</a>
+              <a className="text-black text-sm font-medium border-b-2 border-black pb-4 mt-4" href="/research/macro">Macro</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research">Research Hub</a>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -83,7 +83,7 @@ function MacroDashboard() {
 
           {loading && (
             <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
               <p className="mt-4 text-slate-500">Loading macro data...</p>
             </div>
           )}
@@ -102,7 +102,7 @@ function MacroDashboard() {
               {macroData && (
                 <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary">table_chart</span>
+                    <span className="material-symbols-outlined text-black">table_chart</span>
                     Key Indicators at a Glance
                   </h3>
 
@@ -125,7 +125,7 @@ function MacroDashboard() {
               {analysis && (
                 <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary">tips_and_updates</span>
+                    <span className="material-symbols-outlined text-black">tips_and_updates</span>
                     Trading Implications
                   </h3>
 

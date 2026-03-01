@@ -1,22 +1,24 @@
-# TradeTracker Pro - Next.js Edition
+# Palrin - AI-Powered Trading Intelligence Platform
 
-A modern, serverless AI-powered trading journal and equity research assistant built with Next.js for seamless Vercel deployment.
+A modern, serverless AI-powered trading journal and equity research assistant built with Next.js for seamless Vercel deployment. Palrin features a clean, minimalist monochrome design for professional traders.
 
 ## 🚀 Features
 
 - **Modern Next.js Architecture**: Built with Next.js 14 for optimal performance
 - **Serverless Ready**: Deploy instantly to Vercel with zero configuration
 - **Firebase Authentication**: Secure Google OAuth integration
-- **Cyber-themed UI**: Beautiful dark theme with neon accents
+- **Monochrome UI**: Clean black, white, and grey minimalist design
 - **Responsive Design**: Works perfectly on all devices
 - **AI-Powered Analysis**: Ready for trading insights and stock analysis
+- **NSE India Support**: Direct integration with Indian stock market data
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 14, React 18, Tailwind CSS
 - **Authentication**: Firebase Auth
-- **Styling**: Custom cyber theme with Tailwind CSS
-- **Icons**: Lucide React
+- **Styling**: Custom monochrome theme with Tailwind CSS
+- **Design System**: Palrin minimalist design language
+- **Icons**: Material Symbols
 - **Deployment**: Vercel (serverless)
 
 ## 📁 Project Structure
@@ -31,7 +33,7 @@ trade_tracker/
 │   ├── index.js         # Login page
 │   └── dashboard.js     # Main dashboard
 ├── styles/              # Global styles
-│   └── globals.css      # Cyber theme and custom CSS
+│   └── globals.css      # Monochrome theme and custom CSS
 ├── package.json         # Dependencies and scripts
 ├── next.config.js       # Next.js configuration
 ├── tailwind.config.js   # Tailwind CSS configuration

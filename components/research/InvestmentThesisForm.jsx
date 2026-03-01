@@ -33,7 +33,7 @@ export default function InvestmentThesisForm({ thesis, onChange }) {
         className="w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary text-lg">psychology</span>
+          <span className="material-symbols-outlined text-black text-lg">psychology</span>
           <span className="text-sm font-bold text-slate-700 dark:text-slate-300">Investment Thesis</span>
           <span className="text-[10px] text-slate-400">(Optional)</span>
         </div>
@@ -55,8 +55,8 @@ export default function InvestmentThesisForm({ thesis, onChange }) {
                   onClick={() => updateField('tradeType', t.value)}
                   className={`p-2 rounded-lg border text-center transition-colors ${
                     thesis?.tradeType === t.value
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50'
+                      ? 'border-black bg-neutral-900/10 text-black'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-neutral-900/50'
                   }`}
                 >
                   <p className="text-xs font-bold">{t.label}</p>
@@ -77,8 +77,8 @@ export default function InvestmentThesisForm({ thesis, onChange }) {
                   onClick={() => updateField('thesisCategory', c.value)}
                   className={`flex items-center gap-2 p-2 rounded-lg border text-left transition-colors ${
                     thesis?.thesisCategory === c.value
-                      ? 'border-primary bg-primary/10 text-primary'
-                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50'
+                      ? 'border-black bg-neutral-900/10 text-black'
+                      : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-neutral-900/50'
                   }`}
                 >
                   <span className="material-symbols-outlined text-sm">{c.icon}</span>
@@ -95,7 +95,7 @@ export default function InvestmentThesisForm({ thesis, onChange }) {
               value={thesis?.thesisDescription || ''}
               onChange={(e) => updateField('thesisDescription', e.target.value)}
               placeholder="Why are you taking this trade? What's your conviction?"
-              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none h-20 text-slate-900 dark:text-white placeholder:text-slate-400"
+              className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-black resize-none h-20 text-slate-900 dark:text-white placeholder:text-slate-400"
             />
           </div>
 
@@ -151,7 +151,7 @@ function ThesisInput({ label, value, onChange, placeholder }) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 dark:text-white placeholder:text-slate-400"
+        className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:ring-2 focus:ring-primary/20 focus:border-black text-slate-900 dark:text-white placeholder:text-slate-400"
       />
     </div>
   );
@@ -175,13 +175,13 @@ export function ThesisDisplay({ thesis }) {
   return (
     <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4 mt-3">
       <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-        <span className="material-symbols-outlined text-sm text-primary">psychology</span>
+        <span className="material-symbols-outlined text-sm text-black">psychology</span>
         Investment Thesis
       </p>
 
       <div className="flex items-center gap-2 mb-2">
         {thesis.tradeType && (
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-primary/10 text-primary uppercase">
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-neutral-900/10 text-black uppercase">
             {thesis.tradeType}
           </span>
         )}
@@ -201,7 +201,7 @@ export function ThesisDisplay({ thesis }) {
         {thesis.sectorReason && <ThesisLine label="Sector" value={thesis.sectorReason} />}
         {thesis.fundamentalReason && <ThesisLine label="Fundamental" value={thesis.fundamentalReason} />}
         {thesis.riskFactors && <ThesisLine label="Risks" value={thesis.riskFactors} color="text-red-500" />}
-        {thesis.expectedCatalyst && <ThesisLine label="Catalyst" value={thesis.expectedCatalyst} color="text-blue-500" />}
+        {thesis.expectedCatalyst && <ThesisLine label="Catalyst" value={thesis.expectedCatalyst} color="text-neutral-700" />}
       </div>
     </div>
   );

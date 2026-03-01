@@ -10,7 +10,7 @@ const MODULES = [
     desc: 'Deep-dive into fundamentals, valuation, profitability & institutional flows',
     icon: 'query_stats',
     href: '/research/company',
-    color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    color: 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800/30 dark:text-neutral-400',
   },
   {
     title: 'Sector Analysis',
@@ -37,7 +37,7 @@ const MODULES = [
     title: 'Legacy Research',
     desc: 'Stock search with AI analysis (original research tool)',
     icon: 'search',
-    href: '/research',
+    href: '/research-legacy',
     color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400',
   },
 ];
@@ -60,15 +60,15 @@ function ResearchHub() {
         {/* Top Nav */}
         <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-50">
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 text-primary">
+            <div className="flex items-center gap-2 text-black">
               <span className="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
               <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Palrin</h2>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/dashboard">Dashboard</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/company">Company</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/sectors">Sectors</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/macro">Macro</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/dashboard">Dashboard</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/company">Company</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/sectors">Sectors</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/macro">Macro</a>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -96,7 +96,7 @@ function ResearchHub() {
                   <a
                     key={m.title}
                     href={m.href}
-                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:border-primary/50 hover:shadow-md transition-all group"
+                    className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:border-neutral-900/50 hover:shadow-md transition-all group"
                   >
                     <div className={`w-12 h-12 rounded-xl ${m.color} flex items-center justify-center mb-4 group-hover:scale-105 transition-transform`}>
                       <span className="material-symbols-outlined text-2xl">{m.icon}</span>
@@ -110,13 +110,13 @@ function ResearchHub() {
               {/* Workflow Guide */}
               <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">route</span>
+                  <span className="material-symbols-outlined text-black">route</span>
                   Research-First Workflow
                 </h3>
                 <div className="flex flex-wrap items-center gap-2 text-sm">
                   {['Macro Scan', 'Sector Filter', 'Company Deep Dive', 'Build Thesis', 'Enter Trade', 'Monitor', 'Exit'].map((step, i) => (
                     <div key={step} className="flex items-center gap-2">
-                      <span className="px-3 py-1.5 bg-primary/10 text-primary rounded-lg text-xs font-bold">{step}</span>
+                      <span className="px-3 py-1.5 bg-neutral-900/10 text-black rounded-lg text-xs font-bold">{step}</span>
                       {i < 6 && <span className="material-symbols-outlined text-slate-300 text-sm">arrow_forward</span>}
                     </div>
                   ))}

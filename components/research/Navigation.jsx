@@ -28,7 +28,7 @@ export default function Navigation() {
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-6 py-3">
       <div className="flex items-center gap-8">
-        <a href="/dashboard" className="flex items-center gap-2 text-primary">
+        <a href="/dashboard" className="flex items-center gap-2 text-black">
           <span className="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
           <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Palrin</h2>
         </a>
@@ -42,8 +42,8 @@ export default function Navigation() {
                 href={item.href}
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   isActive
-                    ? 'text-primary bg-primary/10'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800'
+                    ? 'text-black bg-neutral-900/10'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-neutral-900 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 <span className="material-symbols-outlined text-lg">{item.icon}</span>

@@ -13,7 +13,7 @@ export default function SectorHeatmap({ sectors, heatmap }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
       <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-        <span className="material-symbols-outlined text-primary">grid_view</span>
+        <span className="material-symbols-outlined text-black">grid_view</span>
         Sector Heatmap
       </h3>
 
@@ -69,7 +69,7 @@ export default function SectorHeatmap({ sectors, heatmap }) {
               return (
                 <tr key={sector.sectorName} className="hover:bg-slate-50 dark:hover:bg-slate-800/30">
                   <td className="px-4 py-3">
-                    <a href={`/research/sectors/${encodeURIComponent(sector.sectorName)}`} className="font-medium text-sm text-slate-900 dark:text-white hover:text-primary">
+                    <a href={`/research/sectors/${encodeURIComponent(sector.sectorName)}`} className="font-medium text-sm text-slate-900 dark:text-white hover:text-neutral-900">
                       {sector.sectorName}
                     </a>
                   </td>

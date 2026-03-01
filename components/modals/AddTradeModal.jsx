@@ -101,7 +101,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
         {/* Header */}
         <div className="flex justify-between items-center px-6 py-4 border-b border-slate-200 dark:border-slate-800">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-xl">add_chart</span>
+            <span className="material-symbols-outlined text-black text-xl">add_chart</span>
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Open New Position</h2>
           </div>
           <button onClick={onClose} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
@@ -194,7 +194,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
             <select
               value={form.exchange}
               onChange={(e) => update('exchange', e.target.value)}
-              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-black transition-all"
             >
               <option value="NASDAQ">NASDAQ</option>
               <option value="NYSE">NYSE</option>
@@ -211,10 +211,10 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
                 type="button"
                 onClick={getAIAnalysis}
                 disabled={analysisLoading || !form.symbol.trim()}
-                className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1 text-xs font-bold text-black hover:text-neutral-900/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               >
                 {analysisLoading ? (
-                  <><div className="animate-spin rounded-full h-3 w-3 border-2 border-primary border-t-transparent"></div> Analyzing...</>
+                  <><div className="animate-spin rounded-full h-3 w-3 border-2 border-black border-t-transparent"></div> Analyzing...</>
                 ) : (
                   <><Zap className="h-3 w-3" /> AI Analysis</>
                 )}
@@ -225,7 +225,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
               onChange={(e) => update('reason', e.target.value)}
               placeholder="Why are you entering this trade?"
               rows={2}
-              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none placeholder:text-slate-400"
+              className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-black transition-all resize-none placeholder:text-slate-400"
             />
           </div>
 
@@ -244,7 +244,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
 
           {/* Trade Value Preview */}
           {form.entryPrice && form.quantity && (
-            <div className="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-lg">
+            <div className="flex items-center justify-between p-3 bg-neutral-900/5 border border-black/20 rounded-lg">
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase">Position Value</span>
               <span className="text-sm font-bold text-slate-900 dark:text-white">
                 ${(parseFloat(form.entryPrice || 0) * parseInt(form.quantity || 0)).toLocaleString('en-US', { minimumFractionDigits: 2 })}
@@ -257,7 +257,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-3 bg-primary hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm rounded-lg transition-colors"
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-black hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-sm rounded-lg transition-colors"
             >
               {loading ? (
                 <><div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div> Opening...</>

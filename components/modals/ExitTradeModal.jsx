@@ -109,7 +109,7 @@ export default function ExitTradeModal({ isOpen, onClose, trade, onExited }) {
                 value={exitPrice}
                 onChange={(e) => setExitPrice(e.target.value)}
                 placeholder="Exit price"
-                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:ring-2 focus:ring-primary/20 focus:border-black"
               />
             )}
           </div>

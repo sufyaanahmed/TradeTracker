@@ -7,7 +7,7 @@ export default function FIIDIIFlows({ company, analysis }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
       <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-        <span className="material-symbols-outlined text-primary">groups</span>
+        <span className="material-symbols-outlined text-black">groups</span>
         Institutional Ownership
       </h3>
 
@@ -26,7 +26,7 @@ export default function FIIDIIFlows({ company, analysis }) {
           </div>
           <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3">
             <div
-              className="h-3 rounded-full bg-blue-500 transition-all"
+              className="h-3 rounded-full bg-neutral-1000 transition-all"
               style={{ width: `${Math.min(100, company.fiiHolding)}%` }}
             />
           </div>

@@ -1,6 +1,6 @@
 {
-  "name": "trade-tracker-pro",
-  "version": "1.0.0",
+  "name": "palrin",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "axios": "^1.6.0",
     "chart.js": "^4.5.1",
     "cheerio": "^1.2.0",

@@ -39,7 +39,7 @@ export default function ValuationMetrics({ company, analysis }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
       <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-        <span className="material-symbols-outlined text-primary">analytics</span>
+        <span className="material-symbols-outlined text-black">analytics</span>
         Valuation Metrics
       </h3>
 
@@ -62,11 +62,11 @@ export default function ValuationMetrics({ company, analysis }) {
 
       {/* Fundamental Score */}
       {analysis && (
-        <div className="mt-4 p-4 rounded-lg bg-primary/5 border border-primary/10">
+        <div className="mt-4 p-4 rounded-lg bg-neutral-900/5 border border-black/10">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Fundamental Score</p>
-              <p className="text-3xl font-bold text-primary mt-1">{analysis.fundamentalScore}/100</p>
+              <p className="text-3xl font-bold text-black mt-1">{analysis.fundamentalScore}/100</p>
             </div>
             <div className={`px-3 py-1.5 rounded-lg text-sm font-bold ${
               analysis.sentiment === 'bullish' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :

@@ -86,14 +86,14 @@ function Research() {
           <div className="max-w-[1200px] mx-auto flex items-center justify-between">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2">
-                <div className="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+                <div className="size-8 bg-black rounded-lg flex items-center justify-center text-white">
                   <span className="material-symbols-outlined text-xl">query_stats</span>
                 </div>
                 <h2 className="text-lg font-bold tracking-tight">StockSaaS</h2>
               </div>
               <nav className="hidden md:flex items-center gap-6">
-                <a className="text-sm font-medium text-slate-500 hover:text-primary transition-colors" href="/dashboard">Dashboard</a>
-                <a className="text-sm font-semibold text-primary relative after:content-[''] after:absolute after:-bottom-[19px] after:left-0 after:w-full after:h-[2px] after:bg-primary" href="/research">Research</a>
+                <a className="text-sm font-medium text-slate-500 hover:text-neutral-900 transition-colors" href="/dashboard">Dashboard</a>
+                <a className="text-sm font-semibold text-black relative after:content-[''] after:absolute after:-bottom-[19px] after:left-0 after:w-full after:h-[2px] after:bg-black" href="/research">Research</a>
               </nav>
             </div>
             <div className="flex items-center gap-4">
@@ -108,9 +108,9 @@ function Research() {
                 </div>
                 <button 
                   onClick={handleSignOut}
-                  className="size-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden hover:bg-primary/20 transition-colors"
+                  className="size-9 rounded-full bg-neutral-900/10 border border-black/20 flex items-center justify-center overflow-hidden hover:bg-black/20 transition-colors"
                 >
-                  <span className="material-symbols-outlined text-primary text-sm">logout</span>
+                  <span className="material-symbols-outlined text-black text-sm">logout</span>
                 </button>
               </div>
             </div>
@@ -123,10 +123,10 @@ function Research() {
             <h1 className="text-2xl font-bold mb-6">Market Research</h1>
             <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <span className="material-symbols-outlined text-slate-400 group-focus-within:text-primary transition-colors">search</span>
+                <span className="material-symbols-outlined text-slate-400 group-focus-within:text-black transition-colors">search</span>
               </div>
               <input 
-                className="block w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-slate-400 text-lg"
+                className="block w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-xl shadow-sm focus:ring-2 focus:ring-primary/20 focus:border-black transition-all placeholder:text-slate-400 text-lg"
                 placeholder="Search ticker, company, or news (e.g., AAPL)..."
                 type="text"
                 value={searchSymbol}
@@ -143,7 +143,7 @@ function Research() {
           {/* Loading State */}
           {loading && (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
               <p className="mt-4 text-slate-500">Searching for {searchSymbol}...</p>
             </div>
           )}
@@ -232,7 +232,7 @@ function Research() {
                   <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                        <div className="size-10 rounded-lg bg-neutral-900/10 flex items-center justify-center text-black">
                           <span className="material-symbols-outlined">auto_awesome</span>
                         </div>
                         <h3 className="text-lg font-bold">AI Stock Analysis</h3>
@@ -241,7 +241,7 @@ function Research() {
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-slate-400">Confidence Score: {aiAnalysis.confidence || 94}%</span>
                           <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                            <div className="bg-primary h-full" style={{ width: `${aiAnalysis.confidence || 94}%` }}></div>
+                            <div className="bg-black h-full" style={{ width: `${aiAnalysis.confidence || 94}%` }}></div>
                           </div>
                         </div>
                       )}
@@ -249,7 +249,7 @@ function Research() {
                     
                     {analysisLoading ? (
                       <div className="py-12 text-center">
-                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
                         <p className="text-slate-500">Analyzing with AI...</p>
                       </div>
                     ) : aiAnalysis ? (
@@ -260,14 +260,14 @@ function Research() {
                               ? 'bg-emerald-50/50 border-emerald-100/50'
                               : insight.type === 'negative'
                               ? 'bg-red-50/50 border-red-100/50'
-                              : 'bg-blue-50/50 border-blue-100/50'
+                              : 'bg-neutral-100/50 border-neutral-200/50'
                           }`}>
                             <span className={`material-symbols-outlined mt-0.5 shrink-0 ${
                               insight.type === 'positive' 
                                 ? 'text-emerald-600'
                                 : insight.type === 'negative'
                                 ? 'text-red-600'
-                                : 'text-blue-600'
+                                : 'text-black'
                             }`}>
                               {insight.icon || 'info'}
                             </span>
@@ -277,7 +277,7 @@ function Research() {
                                   ? 'text-emerald-900'
                                   : insight.type === 'negative'
                                   ? 'text-red-900'
-                                  : 'text-blue-900'
+                                  : 'text-neutral-950'
                               }`}>
                                 {insight.title}
                               </p>
@@ -286,7 +286,7 @@ function Research() {
                                   ? 'text-emerald-800/80'
                                   : insight.type === 'negative'
                                   ? 'text-red-800/80'
-                                  : 'text-blue-800/80'
+                                  : 'text-neutral-900/80'
                               }`}>
                                 {insight.description}
                               </p>
@@ -345,7 +345,7 @@ function Research() {
                     </p>
                     <button 
                       onClick={() => router.push('/dashboard')}
-                      className="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition-all shadow-md active:scale-[0.98] relative z-10 flex items-center justify-center gap-2"
+                      className="w-full bg-black hover:bg-black text-white font-bold py-3 rounded-lg transition-all shadow-md active:scale-[0.98] relative z-10 flex items-center justify-center gap-2"
                     >
                       <span>Create Trade from Research</span>
                       <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -380,7 +380,7 @@ function Research() {
                   <div className="absolute flex flex-col items-center gap-1">
                     <span className="material-symbols-outlined text-slate-300 text-4xl">monitoring</span>
                     <p className="text-slate-400 text-sm font-medium">Interactive Chart View</p>
-                    <button className="mt-2 text-primary text-xs font-bold hover:underline">Launch Full Terminal</button>
+                    <button className="mt-2 text-black text-xs font-bold hover:underline">Launch Full Terminal</button>
                   </div>
                 </div>
               </section>

@@ -8,7 +8,7 @@ const Button = React.forwardRef(({ className, variant = "default", size = "defau
     default: "",
     outline: "border border-input hover:bg-accent hover:text-accent-foreground",
     ghost: "hover:bg-accent hover:text-accent-foreground",
-    link: "underline-offset-4 hover:underline text-primary"
+    link: "underline-offset-4 hover:underline text-black"
   };
   
   const sizes = {

@@ -34,11 +34,11 @@ export default function TradeIdeasPanel({ compact = false }) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">lightbulb</span>
+          <span className="material-symbols-outlined text-black">lightbulb</span>
           Trade Ideas
         </h3>
         <div className="flex items-center justify-center py-8">
-          <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary border-t-transparent"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-black border-t-transparent"></div>
           <span className="ml-3 text-sm text-slate-500">Generating ideas...</span>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function TradeIdeasPanel({ compact = false }) {
       <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">Trade Ideas</h3>
         <p className="text-sm text-red-500">{error}</p>
-        <button onClick={fetchIdeas} className="mt-2 text-xs text-primary font-bold hover:underline">Retry</button>
+        <button onClick={fetchIdeas} className="mt-2 text-xs text-black font-bold hover:underline">Retry</button>
       </div>
     );
   }
@@ -61,7 +61,7 @@ export default function TradeIdeasPanel({ compact = false }) {
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-          <span className="material-symbols-outlined text-primary">lightbulb</span>
+          <span className="material-symbols-outlined text-black">lightbulb</span>
           Swing Trade Ideas
         </h3>
         {macroSentiment && (
@@ -86,7 +86,7 @@ export default function TradeIdeasPanel({ compact = false }) {
       )}
 
       {compact && ideas.length > 5 && (
-        <a href="/research/trade-ideas" className="block text-center text-xs text-primary font-bold mt-4 hover:underline">
+        <a href="/research/trade-ideas" className="block text-center text-xs text-black font-bold mt-4 hover:underline">
           View all {ideas.length} ideas →
         </a>
       )}
@@ -99,12 +99,12 @@ function IdeaCard({ idea, rank }) {
 
   return (
     <div
-      className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 hover:border-primary/50 transition-colors cursor-pointer"
+      className="border border-slate-200 dark:border-slate-700 rounded-lg p-3 hover:border-neutral-900/50 transition-colors cursor-pointer"
       onClick={() => setExpanded(!expanded)}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold text-xs">
+          <div className="w-8 h-8 rounded-lg bg-neutral-900/10 flex items-center justify-center text-black font-bold text-xs">
             #{rank}
           </div>
           <div>
@@ -149,7 +149,7 @@ function IdeaCard({ idea, rank }) {
               {idea.institutionalFlow?.replace(/_/g, ' ')}
             </span>
             {idea.macroSupport && (
-              <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              <span className="text-[10px] px-2 py-0.5 rounded font-bold bg-neutral-100 text-neutral-900 dark:bg-neutral-800/30 dark:text-neutral-400">
                 Macro Support
               </span>
             )}
@@ -157,7 +157,7 @@ function IdeaCard({ idea, rank }) {
 
           <a
             href={`/research/company?symbol=${idea.symbol}`}
-            className="block text-xs text-primary font-bold mt-2 hover:underline"
+            className="block text-xs text-black font-bold mt-2 hover:underline"
             onClick={(e) => e.stopPropagation()}
           >
             View Full Research →

@@ -11,7 +11,7 @@ export default function ProfitabilityMetrics({ company, analysis }) {
   return (
     <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
       <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-        <span className="material-symbols-outlined text-primary">account_balance</span>
+        <span className="material-symbols-outlined text-black">account_balance</span>
         Profitability
       </h3>
 

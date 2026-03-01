@@ -49,7 +49,7 @@ function SectorDashboard() {
 
   const rotationPhaseConfig = {
     early_expansion: { icon: 'trending_up', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400', desc: 'Economy expanding, broad participation' },
-    mid_expansion: { icon: 'speed', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', desc: 'Selective growth, leadership emerging' },
+    mid_expansion: { icon: 'speed', color: 'bg-neutral-100 text-neutral-900 dark:bg-neutral-800/30 dark:text-neutral-400', desc: 'Selective growth, leadership emerging' },
     late_expansion: { icon: 'warning', color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', desc: 'Narrowing leadership, defensive tilt' },
     contraction: { icon: 'trending_down', color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', desc: 'Broad weakness, risk-off environment' },
   };
@@ -60,20 +60,20 @@ function SectorDashboard() {
         <title>Sector Analysis | Palrin</title>
       </Head>
 
-      <div className="relative flex min-h-screen w-full flex-col bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100">
+      <div className="relative flex min-h-screen w-full flex-col bg-neutral-50 dark:bg-neutral-950 font-display text-neutral-950 dark:text-white">
         {/* Top Nav */}
-        <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-50">
+        <header className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-6 py-3 sticky top-0 z-50">
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 text-primary">
-              <span className="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
-              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Palrin</h2>
+            <div className="flex items-center gap-3">
+              <img src="/Palrin.png" alt="Palrin" width="28" height="28" className="rounded" />
+              <h2 className="text-xl font-semibold tracking-tight text-neutral-950 dark:text-white">Palrin</h2>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/dashboard">Dashboard</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/company">Company</a>
-              <a className="text-primary text-sm font-semibold border-b-2 border-primary pb-4 mt-4" href="/research/sectors">Sectors</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/macro">Macro</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research">Legacy Research</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/dashboard">Dashboard</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/company">Company</a>
+              <a className="text-black text-sm font-medium border-b-2 border-black pb-4 mt-4" href="/research/sectors">Sectors</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/macro">Macro</a>
+              <a className="text-neutral-600 dark:text-neutral-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research">Research Hub</a>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -92,7 +92,7 @@ function SectorDashboard() {
 
           {loading && (
             <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
               <p className="mt-4 text-slate-500">Loading sector data...</p>
             </div>
           )}

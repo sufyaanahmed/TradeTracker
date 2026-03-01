@@ -54,15 +54,15 @@ function TradeIdeas() {
         {/* Top Nav */}
         <header className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3 sticky top-0 z-50">
           <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 text-primary">
+            <div className="flex items-center gap-2 text-black">
               <span className="material-symbols-outlined text-3xl font-bold">rocket_launch</span>
               <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">Palrin</h2>
             </div>
             <nav className="hidden md:flex items-center gap-6">
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/dashboard">Dashboard</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/company">Company</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/sectors">Sectors</a>
-              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-primary transition-colors" href="/research/macro">Macro</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/dashboard">Dashboard</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/company">Company</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/sectors">Sectors</a>
+              <a className="text-slate-500 dark:text-slate-400 text-sm font-medium hover:text-neutral-900 transition-colors" href="/research/macro">Macro</a>
             </nav>
           </div>
           <div className="flex items-center gap-4">
@@ -96,7 +96,7 @@ function TradeIdeas() {
 
           {loading && (
             <div className="text-center py-16">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
               <p className="mt-4 text-slate-500">Generating trade ideas...</p>
             </div>
           )}
@@ -125,7 +125,7 @@ function TradeIdeas() {
               {/* Methodology */}
               <div className="mt-8 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">psychology</span>
+                  <span className="material-symbols-outlined text-black">psychology</span>
                   Scoring Methodology
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -151,10 +151,10 @@ function TradeIdeas() {
 
 function IdeaCard({ idea, rank }) {
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:border-primary/50 hover:shadow-md transition-all">
+    <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:border-neutral-900/50 hover:shadow-md transition-all">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold">
+          <div className="w-10 h-10 rounded-xl bg-neutral-900/10 flex items-center justify-center text-black font-bold">
             #{rank}
           </div>
           <div>
@@ -197,12 +197,12 @@ function IdeaCard({ idea, rank }) {
 
       {/* Badges */}
       <div className="flex items-center gap-2 mb-4">
-        <span className="px-2 py-1 rounded text-xs font-bold bg-primary/10 text-primary">{idea.tradeType}</span>
+        <span className="px-2 py-1 rounded text-xs font-bold bg-neutral-900/10 text-black">{idea.tradeType}</span>
         <span className="px-2 py-1 rounded text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
           {idea.suggestedHorizon}
         </span>
         {idea.macroSupport && (
-          <span className="px-2 py-1 rounded text-xs font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400">
+          <span className="px-2 py-1 rounded text-xs font-bold bg-neutral-100 dark:bg-neutral-800/30 text-neutral-900 dark:text-neutral-400">
             Macro ✓
           </span>
         )}
@@ -249,7 +249,7 @@ function MethodCard({ title, items }) {
       <ul className="space-y-1">
         {items.map((item, i) => (
           <li key={i} className="text-xs text-slate-600 dark:text-slate-400 flex items-start gap-1.5">
-            <span className="text-primary mt-0.5">•</span>
+            <span className="text-black mt-0.5">•</span>
             {item}
           </li>
         ))}
