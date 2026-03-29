@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { getApps, initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
 import Head from 'next/head';
 
 const firebaseConfig = {
@@ -40,6 +40,19 @@ export default function Home() {
         
         setAuth(authInstance);
         setProvider(providerInstance);
+
+        // Check for redirect result (after user is redirected back from Google)
+        getRedirectResult(authInstance)
+          .then((result) => {
+            if (result) {
+              console.log('Redirect result received:', result.user.email);
+              // The onAuthStateChanged listener will handle the rest
+            }
+          })
+          .catch((error) => {
+            console.error('Redirect result error:', error);
+            setIsLoading(false);
+          });
 
         // Listen for authentication state changes
         const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
@@ -89,9 +102,20 @@ export default function Home() {
     setIsLoading(true);
     try {
       console.log('Starting Google sign in...');
-      const result = await signInWithPopup(auth, provider);
-      console.log('Google sign in successful:', result.user.email);
-      // The onAuthStateChanged listener will handle the redirect
+      
+      // Use redirect in production for better compatibility
+      // Popup works locally but often fails in production due to cookie/popup restrictions
+      if (typeof window !== 'undefined' && (window.location.hostname !== 'localhost' && !window.location.hostname.startsWith('127.'))) {
+        // Production: Use redirect flow (more reliable)
+        await signInWithRedirect(auth, provider);
+        // User will be redirected to Google, then back to this page
+        // The getRedirectResult in useEffect will handle the result
+      } else {
+        // Development: Use popup (better DX for local testing)
+        const result = await signInWithPopup(auth, provider);
+        console.log('Google sign in successful:', result.user.email);
+        // The onAuthStateChanged listener will handle the redirect
+      }
     } catch (error) {
       console.error('Sign in error:', error);
       setIsLoading(false);
@@ -101,6 +125,8 @@ export default function Home() {
         console.log('User closed the popup');
       } else if (error.code === 'auth/popup-blocked') {
         console.log('Popup was blocked by browser');
+      } else if (error.code === 'auth/unauthorized-domain') {
+        console.error('Domain not authorized. Add your domain to Firebase Console > Authentication > Settings > Authorized domains');
       }
     }
   };
