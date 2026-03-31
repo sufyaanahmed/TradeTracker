@@ -42,11 +42,16 @@ export default function Home() {
         setProvider(providerInstance);
 
         // Check for redirect result (after user is redirected back from Google)
+        // Set loading to true while checking for redirect result
+        setIsLoading(true);
         getRedirectResult(authInstance)
           .then((result) => {
             if (result) {
               console.log('Redirect result received:', result.user.email);
-              // The onAuthStateChanged listener will handle the rest
+              // Keep loading state - onAuthStateChanged will handle the rest
+            } else {
+              // No redirect result, user just loaded the page normally
+              setIsLoading(false);
             }
           })
           .catch((error) => {
@@ -82,6 +87,7 @@ export default function Home() {
             localStorage.removeItem('user_uid');
             localStorage.removeItem('user_email');
             localStorage.removeItem('user_name');
+            setIsLoading(false);
           }
         });
 
@@ -144,7 +150,21 @@ export default function Home() {
         <meta name="description" content="Advanced trading intelligence with AI-powered analytics" />
       </Head>
       
-      <div className="relative min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-950 antialiased">
+      {/* Show loading screen while processing authentication */}
+      {isLoading && (
+        <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950">
+          <div className="text-center">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-neutral-200 dark:border-neutral-800 border-t-neutral-900 dark:border-t-white mx-auto"></div>
+            </div>
+            <p className="mt-6 text-lg text-neutral-600 dark:text-neutral-400 font-medium">Signing you in...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Main landing page content */}
+      {!isLoading && (
+        <div className="relative min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-950 antialiased">
         {/* Navbar */}
         <header className="sticky top-0 z-50 w-full border-b border-neutral-200 bg-white/90 backdrop-blur-md dark:bg-neutral-900/90 dark:border-neutral-800">
           <div className="container mx-auto px-6 h-16 flex items-center justify-between">
@@ -379,6 +399,7 @@ export default function Home() {
           </div>
         </footer>
       </div>
+      )}
     </>
   );
 }
