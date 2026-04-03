@@ -40,14 +40,22 @@ function Dashboard() {
   // Polling ref
   const pollRef = useRef(null);
 
-  const getToken = () => localStorage.getItem('firebase_token');
+  const getToken = async () => {
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      return await currentUser.getIdToken();
+    }
+    return localStorage.getItem('firebase_token');
+  };
 
   // ─── Fetch Active Positions ──────────────────────────────
   const fetchActive = useCallback(async (silent = false) => {
     try {
       if (!silent) setLoading(true);
+      const token = await getToken();
       const res = await fetch('/api/trades/active', {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -63,8 +71,9 @@ function Dashboard() {
   // ─── Fetch Closed Trades ─────────────────────────────────
   const fetchClosed = useCallback(async () => {
     try {
+      const token = await getToken();
       const res = await fetch('/api/trades/closed', {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
@@ -79,9 +88,10 @@ function Dashboard() {
   const runMigration = useCallback(async () => {
     try {
       setMigrating(true);
+      const token = await getToken();
       const res = await fetch('/api/trades/migrate', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       console.log('[migration]', data.message);

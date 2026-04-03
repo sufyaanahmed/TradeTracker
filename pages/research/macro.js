@@ -13,7 +13,11 @@ function MacroDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getToken = () => localStorage.getItem('firebase_token');
+  const getToken = async () => {
+    const auth = getAuth();
+    if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+    return localStorage.getItem('firebase_token');
+  };
 
   useEffect(() => {
     fetchMacro();
@@ -22,8 +26,9 @@ function MacroDashboard() {
   const fetchMacro = async () => {
     try {
       setLoading(true);
+      const token = await getToken();
       const res = await fetch('/api/research/macro', {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch macro data');
       const data = await res.json();

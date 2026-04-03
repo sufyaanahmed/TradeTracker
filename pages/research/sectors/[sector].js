@@ -12,7 +12,11 @@ function SectorDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getToken = () => localStorage.getItem('firebase_token');
+  const getToken = async () => {
+    const auth = getAuth();
+    if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+    return localStorage.getItem('firebase_token');
+  };
 
   useEffect(() => {
     if (sectorSlug) fetchSector(sectorSlug);
@@ -21,8 +25,9 @@ function SectorDetail() {
   const fetchSector = async (name) => {
     try {
       setLoading(true);
+      const token = await getToken();
       const res = await fetch(`/api/research/sectors/${encodeURIComponent(name)}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Sector not found');
       const data = await res.json();

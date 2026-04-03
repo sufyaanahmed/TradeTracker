@@ -1,19 +1,31 @@
 import { useState } from 'react';
+import { getAuth } from 'firebase/auth';
 
 export default function QuantEvaluator() {
   const [tradeIntent, setTradeIntent] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const [news, setNews] = useState(null);
+  const [newsLoading, setNewsLoading] = useState(false);
+
+  // Get a fresh Firebase token (auto-refreshes if expired)
+  const getFreshToken = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (!user) throw new Error('Not signed in. Please sign in again.');
+    return await user.getIdToken(true);
+  };
 
   const analyzeIntent = async () => {
     if (!tradeIntent.trim()) return;
     
     setLoading(true);
     setError(null);
+    setNews(null);
     
     try {
-      const token = localStorage.getItem('firebase_token');
+      const token = await getFreshToken();
       const response = await fetch('/api/evaluate-trade-intent', {
         method: 'POST',
         headers: {
@@ -23,16 +35,46 @@ export default function QuantEvaluator() {
         body: JSON.stringify({ text: tradeIntent }),
       });
 
+      if (response.status === 401) {
+        throw new Error('Session expired. Please refresh the page and sign in again.');
+      }
+      if (response.status === 429) {
+        const data = await response.json();
+        throw new Error(data.error || 'API rate limit reached. Try again later.');
+      }
       if (!response.ok) {
-        throw new Error('Analysis failed');
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Analysis failed');
       }
 
       const data = await response.json();
       setResult(data);
+
+      // Fetch news for the parsed symbol
+      if (data.parsedIntent?.symbol) {
+        fetchNews(data.parsedIntent.symbol, token);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchNews = async (symbol, token) => {
+    setNewsLoading(true);
+    try {
+      const response = await fetch(`/api/stock-news?symbol=${encodeURIComponent(symbol)}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setNews(data.articles || []);
+      }
+    } catch (err) {
+      console.error('News fetch error:', err);
+    } finally {
+      setNewsLoading(false);
     }
   };
 
@@ -196,6 +238,66 @@ export default function QuantEvaluator() {
               <p className="text-right text-[10px] text-slate-500 mt-2 uppercase">
                 Updated {new Date().toLocaleTimeString()}
               </p>
+            </div>
+          )}
+
+          {/* Stock News */}
+          {(newsLoading || (news && news.length > 0)) && (
+            <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+              <h3 className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">
+                Latest News — {result.parsedIntent.symbol}
+              </h3>
+              {newsLoading ? (
+                <div className="flex items-center gap-2 text-sm text-slate-400">
+                  <div className="animate-spin w-4 h-4 border-2 border-slate-300 border-t-black rounded-full"></div>
+                  Loading news...
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {news.map((article, idx) => (
+                    <li key={idx} className="group">
+                      <a 
+                        href={article.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="block p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 transition-colors"
+                      >
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium text-slate-900 dark:text-white group-hover:text-black dark:group-hover:text-slate-200 line-clamp-2">
+                              {article.title}
+                            </p>
+                            {article.summary && (
+                              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{article.summary}</p>
+                            )}
+                            <div className="flex items-center gap-2 mt-2">
+                              <span className="text-[10px] font-medium text-slate-400 uppercase">{article.source}</span>
+                              {article.sentiment && (
+                                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                                  article.sentiment === 'Bullish' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' :
+                                  article.sentiment === 'Bearish' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' :
+                                  'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'
+                                }`}>
+                                  {article.sentiment}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-slate-400">{article.timePublished}</span>
+                            </div>
+                          </div>
+                          {article.bannerImage && (
+                            <img 
+                              src={article.bannerImage} 
+                              alt="" 
+                              className="w-16 h-16 rounded object-cover flex-shrink-0"
+                              onError={(e) => e.target.style.display = 'none'}
+                            />
+                          )}
+                        </div>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
         </div>

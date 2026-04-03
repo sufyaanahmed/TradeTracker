@@ -14,7 +14,11 @@ function SectorDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getToken = () => localStorage.getItem('firebase_token');
+  const getToken = async () => {
+    const auth = getAuth();
+    if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+    return localStorage.getItem('firebase_token');
+  };
 
   useEffect(() => {
     fetchSectors();
@@ -23,8 +27,9 @@ function SectorDashboard() {
   const fetchSectors = async () => {
     try {
       setLoading(true);
+      const token = await getToken();
       const res = await fetch('/api/research/sectors', {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch sectors');
       const data = await res.json();

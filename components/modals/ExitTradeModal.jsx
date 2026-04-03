@@ -1,6 +1,13 @@
 // ExitTradeModal — Confirm closing an active position
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import { getAuth } from 'firebase/auth';
+
+const getFreshToken = async () => {
+  const auth = getAuth();
+  if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+  return localStorage.getItem('firebase_token');
+};
 
 export default function ExitTradeModal({ isOpen, onClose, trade, onExited }) {
   const [exitPrice, setExitPrice] = useState('');
@@ -28,7 +35,7 @@ export default function ExitTradeModal({ isOpen, onClose, trade, onExited }) {
     setLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('firebase_token');
+      const token = await getFreshToken();
       const body = { tradeId: trade._id };
       if (!useMarket && exitPrice) {
         body.exitPrice = parseFloat(exitPrice);

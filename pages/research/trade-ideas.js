@@ -12,7 +12,11 @@ function TradeIdeas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const getToken = () => localStorage.getItem('firebase_token');
+  const getToken = async () => {
+    const auth = getAuth();
+    if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+    return localStorage.getItem('firebase_token');
+  };
 
   useEffect(() => {
     fetchIdeas();
@@ -21,8 +25,9 @@ function TradeIdeas() {
   const fetchIdeas = async () => {
     try {
       setLoading(true);
+      const token = await getToken();
       const res = await fetch('/api/research/trade-ideas', {
-        headers: { Authorization: `Bearer ${getToken()}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error('Failed to fetch trade ideas');
       const data = await res.json();

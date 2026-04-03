@@ -1,5 +1,12 @@
 // Trade Ideas Panel component
 import { useState, useEffect } from 'react';
+import { getAuth } from 'firebase/auth';
+
+const getFreshToken = async () => {
+  const auth = getAuth();
+  if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+  return localStorage.getItem('firebase_token');
+};
 
 export default function TradeIdeasPanel({ compact = false }) {
   const [ideas, setIdeas] = useState([]);
@@ -14,7 +21,7 @@ export default function TradeIdeasPanel({ compact = false }) {
   const fetchIdeas = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('firebase_token');
+      const token = await getFreshToken();
       const res = await fetch('/api/research/trade-ideas', {
         headers: { Authorization: `Bearer ${token}` },
       });

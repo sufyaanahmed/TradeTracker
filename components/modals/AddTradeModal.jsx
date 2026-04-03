@@ -3,6 +3,13 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { X, Plus, Zap } from 'lucide-react';
 import InvestmentThesisForm from '../research/InvestmentThesisForm';
+import { getAuth } from 'firebase/auth';
+
+const getFreshToken = async () => {
+  const auth = getAuth();
+  if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+  return localStorage.getItem('firebase_token');
+};
 
 export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
   const [form, setForm] = useState({
@@ -27,7 +34,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
     setError(null);
 
     try {
-      const token = localStorage.getItem('firebase_token');
+      const token = await getFreshToken();
       if (!token) {
         setError('Please log in again');
         return;
@@ -73,7 +80,7 @@ export default function AddTradeModal({ isOpen, onClose, onTradeAdded }) {
     if (!form.symbol.trim()) return;
     setAnalysisLoading(true);
     try {
-      const token = localStorage.getItem('firebase_token');
+      const token = await getFreshToken();
       const response = await fetch('/api/analyze-stock', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },

@@ -29,7 +29,11 @@ function CompanyResearch() {
   const [loadingComprehensive, setLoadingComprehensive] = useState(false);
   const [error, setError] = useState(null);
 
-  const getToken = () => localStorage.getItem('firebase_token');
+  const getToken = async () => {
+    const auth = getAuth();
+    if (auth.currentUser) return await auth.currentUser.getIdToken(true);
+    return localStorage.getItem('firebase_token');
+  };
 
   useEffect(() => {
     const { symbol } = router.query;
@@ -48,7 +52,7 @@ function CompanyResearch() {
       setAnalysis(null);
       setComprehensiveAnalysis(null);
 
-      const token = getToken();
+      const token = await getToken();
       const headers = { Authorization: `Bearer ${token}` };
 
       // Fetch data & analysis in parallel
@@ -79,7 +83,7 @@ function CompanyResearch() {
   const fetchComprehensiveAnalysis = async (symbol) => {
     try {
       setLoadingComprehensive(true);
-      const token = getToken();
+      const token = await getToken();
       const headers = { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
